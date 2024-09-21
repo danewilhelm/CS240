@@ -18,24 +18,28 @@ public class PieceMovesCalculator {
         var pieceType =  board.getPiece(myPosition).getPieceType();
         switch (pieceType) {
             case KING:
+                return new KingMovesCalculator(board, myPosition).calculateKingMoves();
             case QUEEN:
                 return new QueenMovesCalculator(board, myPosition).calculateQueenMoves();
             case BISHOP:
                 return new BishopMovesCalculator(board, myPosition).calculateBishopMoves();
             case KNIGHT:
+                return new KnightMovesCalculator(board, myPosition).calculateKnightMoves();
             case ROOK:
                 return new RookMovesCalculator(board, myPosition).calculateRookMoves();
             case PAWN:
+                return new PawnMovesCalculator(board, myPosition).calculatePawnMoves();
         }
+        System.out.println("ERROR: switch statement didn't work properly");
         return new ArrayList<>();
     }
 
     //=================== Helper Functions for calculating possible moves=======================
-    //-------------------Exploring Directions--------------------------------------------------
+    //-------------------Exploring Directions (Bishop, Rook, Queen)-----------------------------
 
     protected Collection<ChessMove> exploreDirectionAcrossBoard(int rowRelative, int colRelative) {
         ChessPosition previousPosition = myPosition;
-        ChessPosition nextPosition = myPosition.createNewPosition(rowRelative, colRelative);
+        ChessPosition nextPosition = myPosition.createRelativePosition(rowRelative, colRelative);
 
         Collection<ChessMove> possibleMoves = new ArrayList<>();
         while(endPositionIsPossible(nextPosition)) {
@@ -47,7 +51,7 @@ public class PieceMovesCalculator {
                 break;
             }
             previousPosition = nextPosition;
-            nextPosition = nextPosition.createNewPosition(rowRelative, colRelative);
+            nextPosition = nextPosition.createRelativePosition(rowRelative, colRelative);
         }
         return possibleMoves;
     }
@@ -72,9 +76,21 @@ public class PieceMovesCalculator {
         return mergeChessMoveCollections(NestedCollection);
     }
 
+    // --------------------Exploring Positions (Kings, pawns, and knights)-------------------------
+    protected Collection<ChessMove> exploreRelativePositions(int[][] relativeCoordinates, ChessPiece.PieceType promotionPieceType) {
+        Collection<ChessMove> possibleMoves = new ArrayList<>();
+        for (int[] curRelativeCoordinates : relativeCoordinates) {
+            ChessPosition curEndPosition = myPosition.createRelativePosition(curRelativeCoordinates[0], curRelativeCoordinates[1]);
+            if (endPositionIsPossible(curEndPosition)) {
+                ChessMove possibleChessMove = new ChessMove(myPosition, curEndPosition, promotionPieceType);
+                possibleMoves.add(possibleChessMove);
+            }
+        }
 
+        return possibleMoves;
+    }
 
-    // -----------------------Condensing Possible Moves and Debugging--------------------------------------
+    // -----------------------Condensing Possible Moves and Debugging-------------------------------
 
         protected Collection<ChessMove> mergeChessMoveCollections(Collection<Collection<ChessMove>> nestedCollection) {
             // Note: a collection of moveCollections makes it easier to debug

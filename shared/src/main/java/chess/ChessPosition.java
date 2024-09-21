@@ -32,7 +32,7 @@ public class ChessPosition {
         return col;
     }
 
-    public ChessPosition createNewPosition(int rowRelative, int colRelative) {
+    public ChessPosition createRelativePosition(int rowRelative, int colRelative) {
         return new ChessPosition(row + rowRelative, col + colRelative);
     }
 
