@@ -29,10 +29,10 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         allPossibleMoves.addAll(upLeftMoves);
 
          // DEBUG
-//         System.out.println(upRightMoves);
-//         System.out.println(downRightMoves);
-//         System.out.println(downLeftMoves);
-//         System.out.println(upLeftMoves);
+         System.out.println(upRightMoves);
+         System.out.println(downRightMoves);
+         System.out.println(downLeftMoves);
+         System.out.println(upLeftMoves);
 
 
         return allPossibleMoves;
@@ -47,6 +47,11 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         while(endPositionIsPossible(nextPosition)) {
             ChessMove possibleChessMove = new ChessMove(myPosition, nextPosition, null);
             possibleMoves.add(possibleChessMove);
+
+            if (! isOpenPosition(nextPosition) && isEnemyPosition(nextPosition)) {
+                // end position on enemy is valid, but can't go past
+                break;
+            }
             previousPosition = nextPosition;
             nextPosition = nextPosition.createNewPosition(rowRelative, colRelative);
         }
