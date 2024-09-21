@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 
 public class PieceMovesCalculator {
-    // instance varaibles
-
+    // Abstract interface class
+    // instance variables and constructor used in child classes
     protected ChessBoard board;
     protected ChessPosition myPosition;
 
@@ -15,11 +15,7 @@ public class PieceMovesCalculator {
     }
 
     static public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-
-
-        ChessPiece CurChessPiece = board.getPiece(myPosition);
-        var pieceType = CurChessPiece.getPieceType();
-
+        var pieceType =  board.getPiece(myPosition).getPieceType();
         switch (pieceType) {
             case KING:
             case QUEEN:
@@ -31,11 +27,10 @@ public class PieceMovesCalculator {
             case PAWN:
         }
         return new ArrayList<>();
-
     }
 
-
     //=================== Helper Functions for calculating possible moves=======================
+    //-------------------Exploring Directions--------------------------------------------------
 
     protected Collection<ChessMove> exploreDirectionAcrossBoard(int rowRelative, int colRelative) {
         ChessPosition previousPosition = myPosition;
@@ -56,6 +51,45 @@ public class PieceMovesCalculator {
         return possibleMoves;
     }
 
+    protected Collection<ChessMove> exploreAllDiagonals() {
+        Collection<Collection<ChessMove>> NestedCollection = new ArrayList<>();
+        NestedCollection.add(exploreDirectionAcrossBoard(1, 1));
+        NestedCollection.add(exploreDirectionAcrossBoard(-1, 1));
+        NestedCollection.add(exploreDirectionAcrossBoard(-1, -1));
+        NestedCollection.add(exploreDirectionAcrossBoard(1, -1));
+
+        return mergeChessMoveCollections(NestedCollection);
+    }
+
+    protected Collection<ChessMove> exploreAllStraights() {
+        Collection<Collection<ChessMove>> NestedCollection = new ArrayList<>();
+        NestedCollection.add(exploreDirectionAcrossBoard(1, 0));
+        NestedCollection.add(exploreDirectionAcrossBoard(0, 1));
+        NestedCollection.add(exploreDirectionAcrossBoard(-1, 0));
+        NestedCollection.add(exploreDirectionAcrossBoard(0, -1));
+
+        return mergeChessMoveCollections(NestedCollection);
+    }
+
+
+
+    // -----------------------Condensing Possible Moves and Debugging--------------------------------------
+
+        protected Collection<ChessMove> mergeChessMoveCollections(Collection<Collection<ChessMove>> nestedCollection) {
+            // Note: a collection of moveCollections makes it easier to debug
+            // It maintains each direction separately
+        Collection<ChessMove> allPossibleMoves = new ArrayList<>();
+            // DEBUG
+            // System.out.print("starting position: ");
+            // System.out.println(myPosition);
+        for (Collection<ChessMove> moveCollection : nestedCollection) {
+            allPossibleMoves.addAll(moveCollection);
+            System.out.println(moveCollection); // DEBUG
+        }
+        return allPossibleMoves;
+    }
+
+    // ------------------------Boolean Methods for Possible Moves-------------------------
 
     protected boolean endPositionIsPossible(ChessPosition endPosition) {
         System.out.print("\nChecking if following position is possible: ");
