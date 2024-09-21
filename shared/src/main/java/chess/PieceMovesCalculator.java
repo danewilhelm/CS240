@@ -20,10 +20,10 @@ public class PieceMovesCalculator {
             case KING:
             case QUEEN:
             case BISHOP:
-                BishopMovesCalculator bishopCalculator = new BishopMovesCalculator(board, myPosition);
-                return bishopCalculator.calculateBishopMoves();
+                return new BishopMovesCalculator(board, myPosition).calculateBishopMoves();
             case KNIGHT:
             case ROOK:
+                return new RookMovesCalculator(board, myPosition).calculateRookMoves();
             case PAWN:
         }
         return new ArrayList<>();
