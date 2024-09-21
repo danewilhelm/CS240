@@ -31,4 +31,13 @@ public class ChessPosition {
     public int getColumn() {
         return col;
     }
+
+    public ChessPosition createNewPosition(int rowRelative, int colRelative) {
+        return new ChessPosition(row + rowRelative, col + colRelative);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("{%d, %d}", row, col);
+    }
 }
