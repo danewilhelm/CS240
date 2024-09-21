@@ -1,17 +1,13 @@
 package chess;
-//import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 public class BishopMovesCalculator extends PieceMovesCalculator {
 
-    private ChessBoard board;
-    private ChessPosition myPosition;
+    // instance variables are inherited
 
     public BishopMovesCalculator(ChessBoard board, ChessPosition myPosition) {
-        this.board = board;
-        this.myPosition = myPosition;
+        super(board, myPosition);
     }
 
 
@@ -26,28 +22,28 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         Collection<ChessMove> downLeftMoves = exploreDirectionAcrossBoard(-1, -1);
         Collection<ChessMove> upLeftMoves = exploreDirectionAcrossBoard(1, -1);
 
-        Collection<ChessMove> allPossibleMoves = new HashSet<>();
+        Collection<ChessMove> allPossibleMoves = new ArrayList<>();
         allPossibleMoves.addAll(upRightMoves);
         allPossibleMoves.addAll(downRightMoves);
         allPossibleMoves.addAll(downLeftMoves);
         allPossibleMoves.addAll(upLeftMoves);
 
          // DEBUG
-         System.out.println(upRightMoves);
-         System.out.println(downRightMoves);
-         System.out.println(downLeftMoves);
-         System.out.println(upLeftMoves);
+//         System.out.println(upRightMoves);
+//         System.out.println(downRightMoves);
+//         System.out.println(downLeftMoves);
+//         System.out.println(upLeftMoves);
 
 
         return allPossibleMoves;
     }
     //=================== Helper Functions for calculating possible moves=======================
 
-    public Collection<ChessMove> exploreDirectionAcrossBoard(int rowRelative, int colRelative) {
+    protected Collection<ChessMove> exploreDirectionAcrossBoard(int rowRelative, int colRelative) {
         ChessPosition previousPosition = myPosition;
         ChessPosition nextPosition = myPosition.createNewPosition(rowRelative, colRelative);
 
-        Collection<ChessMove> possibleMoves = new HashSet<>();
+        Collection<ChessMove> possibleMoves = new ArrayList<>();
         while(endPositionIsPossible(nextPosition)) {
             ChessMove possibleChessMove = new ChessMove(myPosition, nextPosition, null);
             possibleMoves.add(possibleChessMove);
@@ -58,7 +54,7 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
     }
 
 
-    public boolean endPositionIsPossible(ChessPosition endPosition) {
+    protected boolean endPositionIsPossible(ChessPosition endPosition) {
         System.out.print("\nChecking if following position is possible: ");
         System.out.println(endPosition);
         if (isOutOfBounds(endPosition)) {
@@ -80,7 +76,7 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         return false;
     }
 
-    public boolean isOutOfBounds(ChessPosition endPosition) {
+    protected boolean isOutOfBounds(ChessPosition endPosition) {
         int x = endPosition.getRow();
         int y = endPosition.getColumn();
 
@@ -94,11 +90,11 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         return false;
     }
 
-    public boolean isOpenPosition(ChessPosition endPosition) {
+    protected boolean isOpenPosition(ChessPosition endPosition) {
         return board.getPiece(endPosition) == null;
     }
 
-    public boolean isEnemyPosition(ChessPosition endPosition) {
+    protected boolean isEnemyPosition(ChessPosition endPosition) {
         return board.getPiece(endPosition).getTeamColor() != board.getPiece(myPosition).getTeamColor();
     }
 

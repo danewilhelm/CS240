@@ -41,4 +41,47 @@ public class ChessBoard {
     public void resetBoard() {
         throw new RuntimeException("Not implemented");
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (!(object instanceof ChessBoard)) {
+            return false;
+        }
+
+        ChessBoard otherBoard = (ChessBoard) object;
+        for (int curRow = 1; curRow < 9; curRow++) {
+            for (int curCol = 1; curCol < 9; curCol++) {
+                ChessPosition curPosition = new ChessPosition(curRow, curCol);
+                if (! this.getPiece(curPosition).equals(otherBoard.getPiece(curPosition))) {
+                    return false;
+                }
+            }
+        }
+        // all pieces in all positions are the same
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 42;
+        for (int curRow = 1; curRow < 9; curRow++) {
+            for (int curCol = 1; curCol < 9; curCol++) {
+                ChessPosition curPosition = new ChessPosition(curRow, curCol);
+                ChessPiece curPiece = getPiece(curPosition);
+                if (curPiece != null) {
+                    result *= curPiece.hashCode();
+                }
+            }
+        }
+
+        return result;
+    }
+
+
+
+
 }

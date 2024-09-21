@@ -50,4 +50,48 @@ public class ChessMove {
 //                ", promotionPiece=" + promotionPiece +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (!(object instanceof ChessMove)) {
+            return false;
+        }
+
+        ChessMove otherMove = (ChessMove) object;
+
+        boolean sameStart = this.startPosition.equals(otherMove.getStartPosition());
+        boolean sameEnd = this.endPosition.equals(otherMove.getEndPosition());
+        boolean samePromotion;
+
+        // if null exists, we cannot use .equals()
+        if (this.promotionPiece == null || otherMove.getPromotionPiece() == null) {
+            // if AT LEAST ONE is null...
+            if (this.promotionPiece == null && otherMove.getPromotionPiece() == null) {
+                // if BOTH are null, they are equal
+                samePromotion = true;
+            } else {
+                // if ONE is null, they are not equal
+                samePromotion = false;
+            }
+        } else {
+            // if NEITHER are null, the pieces must be compared
+            samePromotion = this.promotionPiece.equals(otherMove.getPromotionPiece());
+        }
+
+        return sameStart && sameEnd && samePromotion;
+    }
+
+
+    @Override
+    public int hashCode() {
+        int result = 42 * (startPosition.hashCode() + endPosition.hashCode());
+        if (promotionPiece != null) {
+            result *= promotionPiece.hashCode();
+        }
+        return result;
+    }
 }

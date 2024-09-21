@@ -40,4 +40,23 @@ public class ChessPosition {
     public String toString() {
         return String.format("{%d, %d}", row, col);
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (!(object instanceof ChessPosition)) {
+            return false;
+        }
+
+        ChessPosition otherPosition = (ChessPosition) object;
+        return this.row == otherPosition.getRow() && this.col == otherPosition.getColumn();
+    }
+
+    @Override
+    public int hashCode() {
+        return 42 * (row + col);
+    }
 }

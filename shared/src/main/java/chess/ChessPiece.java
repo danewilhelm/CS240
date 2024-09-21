@@ -11,8 +11,9 @@ import java.util.Collection;
  */
 public class ChessPiece {
 
-    private ChessGame.TeamColor pieceColor;
-    ChessPiece.PieceType type;
+    // Question: was this meant to be package visible?
+    ChessGame.TeamColor pieceColor;
+    private ChessPiece.PieceType type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
@@ -54,5 +55,25 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         return PieceMovesCalculator.pieceMoves(board, myPosition);
+    }
+
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (!(object instanceof ChessPiece)) {
+            return false;
+        }
+
+        ChessPiece otherPiece = (ChessPiece) object;
+        return this.pieceColor == otherPiece.getTeamColor() && this.type == otherPiece.getPieceType();
+    }
+
+    @Override
+    public int hashCode() {
+        return 42 * (type.hashCode() + pieceColor.hashCode());
     }
 }
