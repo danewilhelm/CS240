@@ -30,7 +30,7 @@ public class PieceMovesCalculator {
             case PAWN:
                 return new PawnMovesCalculator(board, myPosition).calculatePawnMoves();
         }
-        System.out.println("ERROR: switch statement didn't work properly");
+//        System.out.println("ERROR: switch statement didn't work properly");
         return new ArrayList<>();
     }
 
@@ -101,7 +101,7 @@ public class PieceMovesCalculator {
             // System.out.println(myPosition);
         for (Collection<ChessMove> moveCollection : nestedCollection) {
             allPossibleMoves.addAll(moveCollection);
-            System.out.println(moveCollection); // DEBUG
+//            System.out.println(moveCollection); // DEBUG
         }
         return allPossibleMoves;
     }
@@ -109,24 +109,24 @@ public class PieceMovesCalculator {
     // ------------------------Boolean Methods for Possible Moves-------------------------
 
     protected boolean endPositionIsPossible(ChessPosition endPosition) {
-        System.out.print("\nChecking if following position is possible: ");
-        System.out.println(endPosition);
+//        System.out.print("\nChecking if following position is possible: ");
+//        System.out.println(endPosition);
         if (isOutOfBounds(endPosition)) {
-            System.out.println("NOT POSSIBLE: Position was out of bounds");
+//            System.out.println("NOT POSSIBLE: Position was out of bounds");
             return false;
         }
 
         if (isOpenPosition(endPosition)) {
-            System.out.println("POSSIBLE: Position was in bounds and empty");
+//            System.out.println("POSSIBLE: Position was in bounds and empty");
 
             return true;
         }
         // else if you can capture the piece, you can move there
         if (isEnemyPosition(endPosition)) {
-            System.out.println("POSSIBLE: Position was in bounds, and occupied by an enemy");
+//            System.out.println("POSSIBLE: Position was in bounds, and occupied by an enemy");
             return true;
         }
-        System.out.println("NOT POSSIBLE: Position was in bounds, but occupied by an ally");
+//        System.out.println("NOT POSSIBLE: Position was in bounds, but occupied by an ally");
         return false;
     }
 
