@@ -15,6 +15,9 @@ public class ChessGame {
     }
 
     /**
+     * Gets which teams turn it is
+     * CS240 Interface Method (name cannot be changed)
+     *
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
@@ -23,6 +26,7 @@ public class ChessGame {
 
     /**
      * Set's which teams turn it is
+     * CS240 Interface Method (name cannot be changed)
      *
      * @param team the team whose turn it is
      */
@@ -32,6 +36,7 @@ public class ChessGame {
 
     /**
      * Enum identifying the 2 possible teams in a chess game
+     * CS240 Interface Method (name cannot be changed)
      */
     public enum TeamColor {
         WHITE,
@@ -40,6 +45,7 @@ public class ChessGame {
 
     /**
      * Gets a valid moves for a piece at the given location
+     * CS240 Interface Method (name cannot be changed)
      *
      * @param startPosition the piece to get valid moves for
      * @return Set of valid moves for requested piece, or null if no piece at
@@ -51,6 +57,7 @@ public class ChessGame {
 
     /**
      * Makes a move in a chess game
+     * CS240 Interface Method (name cannot be changed)
      *
      * @param move chess move to preform
      * @throws InvalidMoveException if move is invalid
@@ -61,6 +68,7 @@ public class ChessGame {
 
     /**
      * Determines if the given team is in check
+     * CS240 Interface Method (name cannot be changed)
      *
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
@@ -71,6 +79,7 @@ public class ChessGame {
 
     /**
      * Determines if the given team is in checkmate
+     * CS240 Interface Method (name cannot be changed)
      *
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
@@ -82,6 +91,7 @@ public class ChessGame {
     /**
      * Determines if the given team is in stalemate, which here is defined as having
      * no valid moves
+     * CS240 Interface Method (name cannot be changed)
      *
      * @param teamColor which team to check for stalemate
      * @return True if the specified team is in stalemate, otherwise false
@@ -92,6 +102,7 @@ public class ChessGame {
 
     /**
      * Sets this game's chessboard with a given board
+     * CS240 Interface Method (name cannot be changed)
      *
      * @param board the new board to use
      */
@@ -101,6 +112,7 @@ public class ChessGame {
 
     /**
      * Gets the current chessboard
+     * CS240 Interface Method (name cannot be changed)
      *
      * @return the chessboard
      */

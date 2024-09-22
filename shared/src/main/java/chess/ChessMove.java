@@ -11,14 +11,15 @@ public class ChessMove {
     private ChessPosition endPosition;
     private ChessPiece.PieceType promotionPiece;
 
-    public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
-                     ChessPiece.PieceType promotionPiece) {
+    public ChessMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece) {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.promotionPiece = promotionPiece;
     }
 
     /**
+     * CS240 Interface Method (name cannot be changed)
+     *
      * @return ChessPosition of starting location
      */
     public ChessPosition getStartPosition() {
@@ -26,6 +27,8 @@ public class ChessMove {
     }
 
     /**
+     * CS240 Interface Method (name cannot be changed)
+     *
      * @return ChessPosition of ending location
      */
     public ChessPosition getEndPosition() {
@@ -35,12 +38,15 @@ public class ChessMove {
     /**
      * Gets the type of piece to promote a pawn to if pawn promotion is part of this
      * chess move
+     * CS240 Interface Method (name cannot be changed)
      *
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
         return promotionPiece;
     }
+
+    //===============================Override Methods===========================================
 
     @Override
     public String toString() {
@@ -61,27 +67,29 @@ public class ChessMove {
             return false;
         }
 
+        // initializing variables
         ChessMove otherMove = (ChessMove) object;
-
         boolean sameStart = this.startPosition.equals(otherMove.getStartPosition());
         boolean sameEnd = this.endPosition.equals(otherMove.getEndPosition());
         boolean samePromotion;
 
-        // if null exists, we cannot use .equals()
-        if (this.promotionPiece == null || otherMove.getPromotionPiece() == null) {
-            // if AT LEAST ONE is null...
-            if (this.promotionPiece == null && otherMove.getPromotionPiece() == null) {
-                // if BOTH are null, they are equal
-                samePromotion = true;
-            } else {
-                // if ONE is null, they are not equal
-                samePromotion = false;
-            }
-        } else {
-            // if NEITHER are null, the pieces must be compared
+        // NOTE: .equals() does not work with null
+        // if both pieces are null, they are equal
+        if (this.promotionPiece == null && otherMove.getPromotionPiece() == null) {
+            samePromotion = true;
+        }
+
+        // if only one piece is null, they are not equal
+        else if (this.promotionPiece == null || otherMove.getPromotionPiece() == null) {
+            samePromotion = false;
+        }
+
+        // if neither piece is null, the pieces must be compared
+        else {
             samePromotion = this.promotionPiece.equals(otherMove.getPromotionPiece());
         }
 
+        // combined boolean statement
         return sameStart && sameEnd && samePromotion;
     }
 

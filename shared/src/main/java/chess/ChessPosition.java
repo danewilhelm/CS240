@@ -17,6 +17,8 @@ public class ChessPosition {
     }
 
     /**
+     * CS240 Interface Method (name cannot be changed)
+     *
      * @return which row this position is in
      * 1 codes for the bottom row
      */
@@ -25,6 +27,8 @@ public class ChessPosition {
     }
 
     /**
+     * CS240 Interface Method (name cannot be changed)
+     *
      * @return which column this position is in
      * 1 codes for the left row
      */
@@ -35,6 +39,8 @@ public class ChessPosition {
     public ChessPosition createRelativePosition(int rowRelative, int colRelative) {
         return new ChessPosition(row + rowRelative, col + colRelative);
     }
+
+    //===============================Override Methods===========================================
 
     @Override
     public String toString() {

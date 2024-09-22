@@ -19,6 +19,6 @@ public class KnightMovesCalculator extends PieceMovesCalculator {
                 {-2, -1}, {-1, -2},
                 {1, -2}, {2, -1}
         };
-        return exploreRelativePositions(relativeKnightCoordinates, null);
+        return exploreRelativePositions(relativeKnightCoordinates);
     }
 }

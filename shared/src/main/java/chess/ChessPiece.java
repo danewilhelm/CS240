@@ -22,6 +22,7 @@ public class ChessPiece {
 
     /**
      * The various different chess piece options
+     * CS240 Interface Method (name cannot be changed)
      */
     public enum PieceType {
         KING,
@@ -33,6 +34,8 @@ public class ChessPiece {
     }
 
     /**
+     * CS240 Interface Method (name cannot be changed)
+     *
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
@@ -40,6 +43,8 @@ public class ChessPiece {
     }
 
     /**
+     * CS240 Interface Method (name cannot be changed)
+     *
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
@@ -50,6 +55,7 @@ public class ChessPiece {
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
      * danger
+     * CS240 Interface Method (name cannot be changed)
      *
      * @return Collection of valid moves
      */
@@ -57,6 +63,7 @@ public class ChessPiece {
         return PieceMovesCalculator.pieceMoves(board, myPosition);
     }
 
+    //===============================Override Methods===========================================
 
     @Override
     public boolean equals(Object object) {
@@ -74,6 +81,6 @@ public class ChessPiece {
 
     @Override
     public int hashCode() {
-        return 42 * (type.hashCode() + pieceColor.hashCode());
+        return 42 * type.hashCode() + 13 * pieceColor.hashCode();
     }
 }

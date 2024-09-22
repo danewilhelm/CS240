@@ -20,7 +20,6 @@ public class KingMovesCalculator extends PieceMovesCalculator {
                 {0, -1}, {1, -1}
         };
 
-        return exploreRelativePositions(relativeKingCoordinates, null);
-
+        return exploreRelativePositions(relativeKingCoordinates);
     }
 }

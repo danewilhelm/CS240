@@ -7,14 +7,15 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessBoard {
+
     private ChessPiece[][] squares = new ChessPiece[8][8];
 
     public ChessBoard() {
-        
     }
 
     /**
      * Adds a chess piece to the chessboard
+     * CS240 Interface Method (name cannot be changed)
      *
      * @param position where to add the piece to
      * @param piece    the piece to add
@@ -25,6 +26,7 @@ public class ChessBoard {
 
     /**
      * Gets a chess piece on the chessboard
+     * CS240 Interface Method (name cannot be changed)
      *
      * @param position The position to get the piece from
      * @return Either the piece at the position, or null if no piece is at that
@@ -37,6 +39,7 @@ public class ChessBoard {
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
+     * CS240 Interface Method (name cannot be changed)
      */
     public void resetBoard() {
         // wipe the board
@@ -49,7 +52,13 @@ public class ChessBoard {
         insertRowOfSpecialPieces(ChessGame.TeamColor.WHITE);
     }
 
+    /**
+     * Inserts a row of pawns based on the given color
+     * A helper method for resetBoard()
+     * @param givenColor The color of pawns to be added
+     */
     private void insertRowOfPawns(ChessGame.TeamColor givenColor) {
+        // find the correct pawn row from the given color
         int colorRow;
         if (givenColor == ChessGame.TeamColor.BLACK) {
             colorRow = 7;
@@ -57,6 +66,7 @@ public class ChessBoard {
             colorRow = 2;
         }
 
+        // add pawns into the row
         for (int curCol = 1; curCol < 9; curCol++) {
             ChessPosition curPosition = new ChessPosition(colorRow, curCol);
             ChessPiece curPiece = new ChessPiece(givenColor, ChessPiece.PieceType.PAWN);
@@ -64,7 +74,21 @@ public class ChessBoard {
         }
     }
 
+    /**
+     * Inserts a row of special pieces based on the given color
+     * A helper method for resetBoard()
+     * @param givenColor The color of special pieces to be added
+     */
     private void insertRowOfSpecialPieces(ChessGame.TeamColor givenColor) {
+        // find row to insert special pieces based on color
+        int colorRow;
+        if (givenColor == ChessGame.TeamColor.BLACK) {
+           colorRow = 8;
+        } else {
+            colorRow = 1;
+        }
+
+        // create order of special pieces
         ChessPiece.PieceType[] specialPiecesOrder = new ChessPiece.PieceType[]{
                 ChessPiece.PieceType.ROOK,
                 ChessPiece.PieceType.KNIGHT,
@@ -76,13 +100,7 @@ public class ChessBoard {
                 ChessPiece.PieceType.ROOK
         };
 
-        int colorRow;
-        if (givenColor == ChessGame.TeamColor.BLACK) {
-           colorRow = 8;
-        } else {
-            colorRow = 1;
-        }
-
+        // add special pieces to the row
         int curCol = 1;
         for (ChessPiece.PieceType curPieceType : specialPiecesOrder) {
             ChessPosition curPosition = new ChessPosition(colorRow, curCol);
@@ -91,6 +109,8 @@ public class ChessBoard {
             curCol++;
         }
     }
+
+    //===============================Override Methods===========================================
 
     @Override
     public boolean equals(Object object) {
@@ -102,47 +122,52 @@ public class ChessBoard {
             return false;
         }
 
+        // deep scan the chessboard to verify if each position has identical pieces
         ChessBoard otherBoard = (ChessBoard) object;
         for (int curRow = 1; curRow < 9; curRow++) {
             for (int curCol = 1; curCol < 9; curCol++) {
+                // get pieces from both boards at current position
                 ChessPosition curPosition = new ChessPosition(curRow, curCol);
                 ChessPiece thisCurPiece = this.getPiece(curPosition);
                 ChessPiece otherCurPiece = otherBoard.getPiece(curPosition);
-                // if both positions are empty, then there is no difference
+
+                // NOTE: .equals() does not work with null
+                // if both positions are empty, they are equal
                 if (thisCurPiece == null && otherCurPiece == null) {
                     continue;
-                // if only one position is empty, then they are NOT equal
                 }
+
+                // if only one position is empty, they are not equal
                 if (thisCurPiece == null || otherCurPiece == null) {
                     return false;
                 }
-                // if both positions are occupied, they must be compared
+
+                // if both positions are occupied, the pieces must be compared
                 if (! this.getPiece(curPosition).equals(otherBoard.getPiece(curPosition))) {
                     return false;
                 }
             }
         }
-        // all pieces in all positions are the same
+        // all positions were verified to have equal pieces
         return true;
     }
 
     @Override
     public int hashCode() {
+        // Note: HashCode() does not work with null
         int result = 42;
         for (int curRow = 1; curRow < 9; curRow++) {
             for (int curCol = 1; curCol < 9; curCol++) {
+                // get piece at current position
                 ChessPosition curPosition = new ChessPosition(curRow, curCol);
                 ChessPiece curPiece = getPiece(curPosition);
+
+                // null protection for HashCode()
                 if (curPiece != null) {
                     result *= curPiece.hashCode();
                 }
             }
         }
-
         return result;
     }
-
-
-
-
 }
