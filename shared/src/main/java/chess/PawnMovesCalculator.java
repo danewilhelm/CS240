@@ -23,9 +23,21 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
         allPossibleEndPositions.addAll(exploreForwardPositions());
         allPossibleEndPositions.addAll(exploreCapturePositions());
 
+        ArrayList<ChessPiece.PieceType> promotionOptions = new ArrayList<>();
+        promotionOptions.add(ChessPiece.PieceType.QUEEN);
+        promotionOptions.add(ChessPiece.PieceType.KNIGHT);
+        promotionOptions.add(ChessPiece.PieceType.BISHOP);
+        promotionOptions.add(ChessPiece.PieceType.ROOK);
+
         Collection<ChessMove> allPossibleMoves = new ArrayList<>();
         for (ChessPosition curEndPosition: allPossibleEndPositions) {
-            allPossibleMoves.add(new ChessMove(myPosition, curEndPosition, null));
+            if (willPromote()) {
+                for (ChessPiece.PieceType promoteOption: promotionOptions) {
+                    allPossibleMoves.add(new ChessMove(myPosition, curEndPosition, promoteOption));
+                }
+            } else {
+                allPossibleMoves.add(new ChessMove(myPosition, curEndPosition, null));
+            }
         }
         return allPossibleMoves;
     }
@@ -104,7 +116,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
 
 
 
-    private boolean isBeingPromoted(int distanceFromPromotion) {
-        return findDistancefromPromotion() == 0;
+    private boolean willPromote() {
+        return findDistancefromPromotion() == 1;
     }
 }
