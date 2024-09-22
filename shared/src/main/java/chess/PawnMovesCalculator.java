@@ -1,5 +1,4 @@
 package chess;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -14,16 +13,98 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
     protected Collection<ChessMove> calculatePawnMoves() {
 
         // Possibility factors
-            // TeamColor
-            // Initial Move
-            // Capturing pieces
+            // TeamColor COMPLETE
+            // Initial Move COMPLETE
+            // Capturing pieces COMPLETE
             // Promotion
 
 
-        int[][] relativePawnCoordinates = new int[][]{
-                {, }, {, },
-                {, }, {, },
-        };
-        return exploreRelativePositions(relativePawnCoordinates, null);
+        Collection<ChessPosition> allPossibleEndPositions = new ArrayList<>();
+        allPossibleEndPositions.addAll(exploreForwardPositions());
+        allPossibleEndPositions.addAll(exploreCapturePositions());
+
+        Collection<ChessMove> allPossibleMoves = new ArrayList<>();
+        for (ChessPosition curEndPosition: allPossibleEndPositions) {
+            allPossibleMoves.add(new ChessMove(myPosition, curEndPosition, null));
+        }
+        return allPossibleMoves;
+    }
+
+    private Collection<ChessPosition> exploreForwardPositions() {
+        Collection<ChessPosition> possibleForwardPositions = new ArrayList<>();
+
+        int colorDirection = findColorDirection();
+        ChessPosition normalForward = myPosition.createRelativePosition(colorDirection, 0);
+        ChessPosition initialForward = myPosition.createRelativePosition(colorDirection * 2, 0);
+        if (! isOutOfBounds(normalForward) && isOpenPosition(normalForward)) {
+            possibleForwardPositions.add(normalForward);
+            // you can only make an initial move if the normal move position is open
+            if (isInitialMove() && isOpenPosition(initialForward)) {
+                possibleForwardPositions.add(initialForward);
+            }
+        }
+        return possibleForwardPositions;
+    }
+
+    private boolean isInitialMove() {
+        return findDistancefromPromotion() == 6;
+    }
+
+    private Collection<ChessPosition> exploreCapturePositions() {
+        int colorDirection = findColorDirection();
+        // create the end positions
+        ChessPosition captureBoardRight = myPosition.createRelativePosition(colorDirection, 1);
+        ChessPosition captureBoardLeft = myPosition.createRelativePosition(colorDirection, -1);
+
+        // determine if the pawn movement conditions are met
+        Collection<ChessPosition> possibleCapturePositions = new ArrayList<>();
+        if (isCapturableAsPawn(captureBoardRight)) {
+            possibleCapturePositions.add(captureBoardRight);
+        }
+        if (isCapturableAsPawn(captureBoardLeft)) {
+            possibleCapturePositions.add(captureBoardLeft);
+        }
+        return possibleCapturePositions;
+    }
+
+    boolean isCapturableAsPawn(ChessPosition endPosition) {
+        return ! isOutOfBounds(endPosition) && ! isOpenPosition(endPosition) && isEnemyPosition(endPosition);
+    }
+
+    private int findColorDirection() {
+        var pawnColor = board.getPiece(myPosition).getTeamColor();
+        int colorDirection;
+        if (pawnColor == ChessGame.TeamColor.WHITE) {
+            colorDirection = 1;
+        } else if (pawnColor == ChessGame.TeamColor.BLACK) {
+            colorDirection = -1;
+        } else {
+            System.out.println("ERROR: piece is neither black or white");
+            colorDirection = 0;
+        }
+        return colorDirection;
+    }
+
+    private int findDistancefromPromotion() {
+        var pawnColor = board.getPiece(myPosition).getTeamColor();
+        int distancefromPromotion = -1;
+        switch(pawnColor) {
+            case WHITE:
+                distancefromPromotion = 8 - myPosition.getRow();
+                break;
+            case BLACK:
+                distancefromPromotion = myPosition.getRow() - 1;
+                break;
+        }
+        return distancefromPromotion;
+    }
+
+
+
+
+
+
+    private boolean isBeingPromoted(int distanceFromPromotion) {
+        return findDistancefromPromotion() == 0;
     }
 }
