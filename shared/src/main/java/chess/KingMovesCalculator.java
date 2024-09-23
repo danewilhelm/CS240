@@ -1,6 +1,4 @@
 package chess;
-import java.sql.Array;
-import java.util.ArrayList;
 import java.util.Collection;
 
 public class KingMovesCalculator extends PieceMovesCalculator {
@@ -12,7 +10,7 @@ public class KingMovesCalculator extends PieceMovesCalculator {
     }
 
     protected Collection<ChessMove> calculateKingMoves() {
-
+    // Represents the 8 squares a king can move to
         int[][] relativeKingCoordinates = new int[][]{
                 {1, 0}, {1, 1},
                 {0, 1}, {-1, 1},

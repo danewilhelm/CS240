@@ -11,37 +11,47 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
     }
 
     protected Collection<ChessMove> calculatePawnMoves() {
-
-        // Possibility factors
-            // TeamColor COMPLETE
-            // Initial Move COMPLETE
-            // Capturing pieces COMPLETE
-            // Promotion
-
-
+        // Explore possible squares to move to
         Collection<ChessPosition> allPossibleEndPositions = new ArrayList<>();
         allPossibleEndPositions.addAll(exploreForwardPositions());
         allPossibleEndPositions.addAll(exploreCapturePositions());
 
+        // Preps the list of possible pieces to promote to (it has 4 options)
         ArrayList<ChessPiece.PieceType> promotionOptions = new ArrayList<>();
         promotionOptions.add(ChessPiece.PieceType.QUEEN);
         promotionOptions.add(ChessPiece.PieceType.KNIGHT);
         promotionOptions.add(ChessPiece.PieceType.BISHOP);
         promotionOptions.add(ChessPiece.PieceType.ROOK);
 
+        // create ChessMoves based on if it will promote or not
         Collection<ChessMove> allPossibleMoves = new ArrayList<>();
         for (ChessPosition curEndPosition: allPossibleEndPositions) {
+
+            // if the pawn will promote, each promotion choice is a different move
             if (willPromote()) {
                 for (ChessPiece.PieceType promoteOption: promotionOptions) {
                     allPossibleMoves.add(new ChessMove(myPosition, curEndPosition, promoteOption));
                 }
-            } else {
+            }
+
+            // else, it is a normal move without promote choices
+            else {
                 allPossibleMoves.add(new ChessMove(myPosition, curEndPosition, null));
             }
         }
         return allPossibleMoves;
     }
 
+    // ===============================Helper Methods===============================================
+    // -------------------------------Explore Pawn Positions---------------------------------------
+
+    /**
+     * Calculates possible endPositions for a pawn
+     * Pawns can move forward one square if it is empty
+     * Pawns can move two squares forward if both squares are empty and it's the pawn's first move
+     *
+     * @return Possible forward positions to move to
+     */
     private Collection<ChessPosition> exploreForwardPositions() {
         Collection<ChessPosition> possibleForwardPositions = new ArrayList<>();
 
@@ -58,10 +68,12 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
         return possibleForwardPositions;
     }
 
-    private boolean isInitialMove() {
-        return findDistancefromPromotion() == 6;
-    }
-
+    /**
+     * Calculates possible capture positions for a pawn
+     * A pawn can move one square diagonally forward (left or right) if it's occupied by an enemy
+     *
+     * @return Possible capture positions
+     */
     private Collection<ChessPosition> exploreCapturePositions() {
         int colorDirection = findColorDirection();
         // create the end positions
@@ -70,19 +82,24 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
 
         // determine if the pawn movement conditions are met
         Collection<ChessPosition> possibleCapturePositions = new ArrayList<>();
-        if (isCapturableAsPawn(captureBoardRight)) {
+        if (willCapture(captureBoardRight)) {
             possibleCapturePositions.add(captureBoardRight);
         }
-        if (isCapturableAsPawn(captureBoardLeft)) {
+        if (willCapture(captureBoardLeft)) {
             possibleCapturePositions.add(captureBoardLeft);
         }
         return possibleCapturePositions;
     }
 
-    boolean isCapturableAsPawn(ChessPosition endPosition) {
-        return ! isOutOfBounds(endPosition) && ! isOpenPosition(endPosition) && isEnemyPosition(endPosition);
-    }
+    // -----------------------Distance and Direction Methods----------------------------
 
+    /**
+     * Finds the direction the pawn can move based on color
+     * Black pawns travel downwards (towards white)
+     * White pawns travel upwards (towards black)
+     *
+     * @return an integer representing the direction the pawn can move
+     */
     private int findColorDirection() {
         var pawnColor = board.getPiece(myPosition).getTeamColor();
         int colorDirection;
@@ -97,6 +114,14 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
         return colorDirection;
     }
 
+    /**
+     * Finds the distance of rows a pawn is from it's promotion row
+     * A pawn's promotion row is on the opposite end of the board
+     * For a white pawn, the promotion row is at the top
+     * For a black pawn, the promotion row is at the bottom
+     *
+     * @return an integer representing a the distance a pawn is promoting
+     */
     private int findDistancefromPromotion() {
         var pawnColor = board.getPiece(myPosition).getTeamColor();
         int distancefromPromotion = -1;
@@ -111,11 +136,33 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
         return distancefromPromotion;
     }
 
+    // ----------------------------------Boolean Methods-------------------------------------
 
+    /**
+     * Checks if the pawn is in the starting pawn row
+     *
+     * @return a boolean
+     */
+    private boolean isInitialMove() {
+        return findDistancefromPromotion() == 6;
+    }
 
+    /**
+     * Checks if an endPosition will result in a capture
+     * It will return false if the position is empty
+     *
+     * @param endPosition
+     * @return a boolean
+     */
+    boolean willCapture(ChessPosition endPosition) {
+        return ! isOutOfBounds(endPosition) && ! isOpenPosition(endPosition) && isEnemyPosition(endPosition);
+    }
 
-
-
+    /**
+     * Checks if the pawn is one row away from promoting
+     *
+     * @return a boolean
+     */
     private boolean willPromote() {
         return findDistancefromPromotion() == 1;
     }
