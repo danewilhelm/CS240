@@ -1,30 +1,13 @@
-# ♕ Phase 0: Chess Moves
+# ♕ Phase 1: Chess Game
 
 - [Chess Application Overview](../chess.md)
 - [Getting Started](getting-started.md)
+- 🖥️ [Slides: Design Principles (Chess Examples)](https://docs.google.com/presentation/d/1dncxSAgnIqjV9RNzGR94EWVltJiCApqC3EvNPqz97-E/edit?usp=sharing)
 - 🖥️ [Videos](#videos)
 
-In this part of the Chess Project, you will implement a basic representation of the game of chess. This includes the setting up of the board and defining how pieces move.
+In the previous phase you implemented the board and pieces along with the rules for setting up the board and moving pieces. In this phase you will implement the `ChessGame` so that you can play a game by making moves and determining check, stalemate, and checkmate.
 
-⚠ Review the [Game of Chess](the-game-of-chess.md) instruction to learn how to set up the board and how each of the pieces move.
-
-## Starter Code
-
-To begin building your chess application, you must first follow the instructions in the [Getting Started Document](getting-started.md).
-
-This provides you with an IntelliJ project that contains the following three modules.
-
-| Phase      | Description                                                                                                                                                                         |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Server** | A program that handles network requests to create and play games. It stores games persistently in a database and sends out notifications to all the players of a game.              |
-| **Client** | The command line program that players use to create and play a game of chess. The client communicates with your server over the network in order to play a game with other clients. |
-| **Shared** | A code library that contains the rules and representation of a chess game that both the `client` and `server` use to exercise and validate game play.                               |
-
-![Modules](modules.png)
-
-In this phase you will implement the shared code that defines the board, pieces, and the rules of chess. In later phases you will use the code you create to create a fully playable game.
-
-The starter code contains the classes defined by the following diagram. However, instead of a full implementation, the methods all simply throw an exception if invoked. The classes are found in the `shared/src/main/java/chess` directory.
+## Code Class Structure
 
 ```mermaid
 
@@ -75,88 +58,54 @@ classDiagram
 
 **⚠ NOTE**: You are not limited to this representation. However, you must not change the existing class names or method signatures since they are used by the pass off tests. You will likely need to add new classes and methods to complete the work required by this phase.
 
-## Chess Classes
+## Class Summaries
 
 ### ChessGame
 
-This class serves as the top-level management of the chess game. It is responsible for executing moves as well as recording the game status.
+This class serves as the top-level management of the Chess Game. It is responsible for executing moves as well as reporting the game status.
 
-You will not need to implement any code in this class for this phase.
-
-#### Key Methods
+**Key Methods**:
 
 - **validMoves**: Takes as input a position on the chessboard and returns all moves the piece there can legally make. If there is no piece at that location, this method returns `null`.
 - **makeMove**: Receives a given move and executes it, provided it is a legal move. If the move is illegal, it throws an `InvalidMoveException`. A move is illegal if the chess piece cannot move there, if the move leaves the team’s king in danger, or if it’s not the corresponding team's turn.
 - **isInCheck**: Returns true if the specified team’s King could be captured by an opposing piece.
 - **isInCheckmate**: Returns true if the given team has no way to protect their king from being captured.
-- **isInStalemate**: Returns true if the given team has no legal moves and it is currently that team’s turn.
+- **isInStalemate**: Returns true if the given team has no legal moves but their king is not in immediate danger.
 
-### ChessBoard
+## Extra Credit Moves
 
-This class stores all the uncaptured pieces in a Game. It needs to support adding and removing pieces for testing, as well as a `resetBoard()` method that sets the standard Chess starting configuration.
+If you would like to fully implement the rules of chess you need to provide support for `En Passant` and `Castling`.
 
-### ChessPiece
+You do not have to implement these moves, but if you go the extra mile and successfully implement them, you’ll earn 5 extra credit points for each move (10 total) on this assignment.
 
-This class represents a single chess piece, with its corresponding type and team color. It contains the `PieceType` enumeration that defines the different types of pieces.
+**`Castling`**
 
-```java
-public enum PieceType {
-    KING,
-    QUEEN,
-    BISHOP,
-    KNIGHT,
-    ROOK,
-    PAWN
-}
-```
+This is a special move where the King and a Rook move simultaneously. The castling move can only be taken when 4 conditions are met:
 
-#### Key Methods
+1. Neither the King nor Rook have moved since the game started
+2. There are no pieces between the King and the Rook
+3. The King is not in Check
+4. Both your Rook and King will be safe after making the move (cannot be captured by any enemy pieces).
 
-- **pieceMoves**: This method is similar to `ChessGame.validMoves`, except it does not honor whose turn it is or check if the king is being attacked. This method does account for enemy and friendly pieces blocking movement paths. The `pieceMoves` method will need to take into account the type of piece, and the location of other pieces on the board.
+To Castle, the King moves 2 spaces towards the Rook, and the Rook "jumps" the king moving to the position next to and on the other side of the King. This is represented in a ChessMove as the king moving 2 spaces to the side.
 
-### ChessMove
+**`En Passant`**
 
-This class represents a possible move a chess piece could make. It contains the starting and ending positions. It also contains a field for the type of piece a pawn is being promoted to. If the move would not result in a pawn being promoted, the promotion type field should be null.
-
-### ChessPosition
-
-This represents a location on the chessboard. This should be represented as a row number from 1-8, and a column number from 1-8. For example, (1,1) corresponds to the bottom left corner (which in chess notation is denoted `a1`). (8,8) corresponds to the top right corner (`h8` in chess notation).
-
-## Testing
-
-The test cases found in `src/test/java/passoff/chess/piece` contain a collection of tests that assert the correct movement of individual pieces.
-
-To run the tests, you can click the play icon next to an individual test, or you can right click on a package or class and select `Debug` or `Debug Tests in …`
-
-![Debug Test](debug-test.png)
-
-## Recommended Development Process
-
-For this project, you are free to implement the classes described above in whatever order you choose. However, it is suggested that you follow the principles of test driven development. Each test is designed for a specific aspect of the overall project. You should look at what each test needs to function, and build piece by piece to the functionality of the project.
-A good process for this is to:
-
-- Identify a test that you feel is the simplest or next in the process.
-- Add the code for the functionality
-- Run the test, debug, and continue implementing until the test passes.
-- Ensure you did not break any tests you previously passed.
-- Commit your changes to GitHub. Smaller changes will be much easier to follow and verify for this project.
-- Repeat the above process for each of the tests until they all pass.
-
-If you are confused at what a test is doing reread the specs to understand what functionality it is looking for, and you can ask for clarification on Slack or to a TA.
-
-## Object Overrides
-
-In order for the tests to pass, you are required to override the `equals()` and `hashCode()` methods in your class implementations as necessary. This includes the ChessPosition, ChessPiece, ChessMove, and ChessBoard classes in particular. To do this automatically in IntelliJ, right click on the class code and select `Code > Generate... > equals() and hashCode()`. It is a good idea to generate these methods fairly early. However, IntelliJ will not be able to generate them properly until you have added the required fields to the class.
-
-In most cases, the default methods provided by IntelliJ will suffice. However, there are cases when the generated code will not completely work. You should fully understand all code in your project. Even code that was generated for you. Take the time to carefully review and debug what the generated code does. Add a breakpoint, inspect the variables, and step through each line.
-
-⚠ Protip: Debugging is often much easier if you also override the `toString()` method and return a concise representation of the object. This is not required, but highly recommended.
+This is a special move taken by a Pawn in response to your opponent double moving a Pawn. If your opponent double moves a pawn so it ends next to yours (skipping the position where your pawn could have captured their pawn), then on your immediately following turn your pawn may capture their pawn as if their pawn had only moved 1 square. This is as if your pawn is capturing their pawn mid motion, or `In Passing`.
 
 ## ☑ Deliverable
 
+### Pass Off Tests
+
+The test cases for this assignment are in the `passoff/chess/game` directory and represent the tests for the overall gameplay. You will need to pass all these tests to pass off this assignment.
+
+Additionally, if you are implementing `Castling` and `En Passant` then include the tests from the starter code in the `extracredit` package. Successfully passing these will earn you some extra credit on this assignment, but are not required for pass off.
+
+To run the tests, you can click the play icon next to an individual test, or you can right click on a package or class and select `Run` or `Run Tests in …`
+
 ### Pass Off, Submission, and Grading
 
-All of the tests in your project must succeed in order to complete this phase.
+All of the tests in your project must succeed in order to complete this phase. If you do not want to complete the extra credit moves then remove those tests from your project.
 
 To pass off this assignment use the course [auto-grading](https://cs240.click/) tool. If your code passes then your grade will automatically be entered in Canvas.
 
@@ -168,10 +117,9 @@ To pass off this assignment use the course [auto-grading](https://cs240.click/) 
 | :------------- | :------------------------------------------------------------------------------------------------ | -----------: |
 | GitHub History | At least 8 GitHub commits evenly spread over the assignment period that demonstrate proof of work | Prerequisite |
 | Functionality  | All pass off test cases succeed                                                                   |          125 |
+| Extra Credit   | `extracredit` test cases succeed                                                                  |    bonus +10 |
 |                | Total                                                                                             |          125 |
 
-## <a name="videos"></a>Videos (21:22)
+## <a name="videos"></a>Videos (6:13)
 
-- 🎥 [Phase 0 Overview (15:51)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=be427737-b0b5-4aec-bb15-b177014da69c)
-
-- 🎥 [Phase 0 Design Tips (5:31)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=88653eac-78a8-4f59-a12a-b170014f61f1)
+- 🎥 [Phase 1 Overview (6:13)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=f2342f5a-8513-44fe-b5cc-b1700151beac)
