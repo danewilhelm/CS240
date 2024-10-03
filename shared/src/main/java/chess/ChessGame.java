@@ -15,7 +15,7 @@ public class ChessGame {
 
     public ChessGame() {
         this.board = new ChessBoard();
-        this.teamTurn = WHITE;
+        this.teamTurn = TeamColor.WHITE;
     }
 
     /**
@@ -25,7 +25,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        return currentTurnColor;
+        return this.teamTurn;
     }
 
     /**
