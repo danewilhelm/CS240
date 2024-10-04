@@ -88,18 +88,21 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if (! isValidMove(move)) {
-            throw new InvalidMoveException("This move is invalid");
+        // store the piece
+        ChessPiece movingPiece = board.getPiece(move.getStartPosition());
+
+        // The move is illegal if it's not the team turn OR it's an invalid move
+        if (movingPiece.getTeamColor() != teamTurn || ! isValidMove(move)) {
+            throw new InvalidMoveException("This move is illegal");
         }
 
-        // store the piece
         // clear the start and end positions (even if the end position was already empty)
         // then place the piece at the end position
-        ChessPiece movingPiece = board.getPiece(move.getStartPosition());
         board.clearPosition(move.getStartPosition());
         board.clearPosition(move.getEndPosition());
         board.addPiece(move.getEndPosition(), movingPiece);
 
+        // it is now the opponent's turn
         switchTeamTurn();
     }
 
@@ -114,9 +117,6 @@ public class ChessGame {
 
     private boolean isValidMove(ChessMove move) {
         ChessPiece movingPiece = board.getPiece(move.getStartPosition());
-        if (movingPiece.getTeamColor() != teamTurn) {
-            return false;
-        }
 
         // use a duplicate board for testing
         ChessBoard testBoard = new ChessBoard(board);
@@ -129,9 +129,7 @@ public class ChessGame {
         board.addPiece(move.getEndPosition(), movingPiece);
 
         // check board status
-
-
-        if (isInCheck(teamTurn)) {
+        if (isInCheck(movingPiece.getTeamColor())) {
             board = liveBoard;
             return false;
         } else {
