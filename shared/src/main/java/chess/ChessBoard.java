@@ -145,6 +145,56 @@ public class ChessBoard {
     //===============================Override Methods===========================================
 
     @Override
+    public String toString() {
+        String stringBoard = "";
+        for (int curRow = 1; curRow < 9; curRow++) {
+            for (int curCol = 1; curCol < 9; curCol++) {
+                stringBoard = stringBoard.concat("|");
+                ChessPosition curPosition = new ChessPosition(curRow, curCol);
+                ChessPiece curPiece = getPiece(curPosition);
+                if (curPiece == null) {
+                    stringBoard = stringBoard.concat(" ");
+                    continue;
+                } else {
+                    ChessGame.TeamColor pieceColor = curPiece.getTeamColor();
+                    var pieceType = curPiece.getPieceType();
+
+                    switch (pieceType) {
+                        case KING:
+                            stringBoard = stringBoard.concat(formatLetterByColor("K", pieceColor));
+                            break;
+                        case QUEEN:
+                            stringBoard = stringBoard.concat(formatLetterByColor("Q", pieceColor));
+                            break;
+                        case BISHOP:
+                            stringBoard = stringBoard.concat(formatLetterByColor("B", pieceColor));
+                            break;
+                        case KNIGHT:
+                            stringBoard = stringBoard.concat(formatLetterByColor("N", pieceColor));
+                            break;
+                        case ROOK:
+                            stringBoard = stringBoard.concat(formatLetterByColor("R", pieceColor));
+                            break;
+                        case PAWN:
+                            stringBoard = stringBoard.concat(formatLetterByColor("P", pieceColor));
+                            break;
+                    }
+                }
+            }
+            stringBoard = stringBoard.concat("|\n");
+        }
+        return stringBoard;
+    }
+
+    private String formatLetterByColor(String letter, ChessGame.TeamColor color) {
+            if (color == ChessGame.TeamColor.WHITE) {
+                return letter.toUpperCase();
+            } else {
+                return letter.toLowerCase();
+            }
+        }
+
+    @Override
     public boolean equals(Object object) {
         if (this == object) {
             return true;
