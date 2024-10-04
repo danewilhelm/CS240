@@ -13,6 +13,16 @@ public class ChessBoard {
     public ChessBoard() {
     }
 
+    public ChessBoard(ChessBoard otherBoard) {
+        for (int curRow = 1; curRow < 9; curRow++) {
+            for (int curCol = 1; curCol < 9; curCol++) {
+                ChessPosition curPosition = new ChessPosition(curRow, curCol);
+                ChessPiece curPiece = getPiece(curPosition);
+                addPiece(curPosition, curPiece);
+            }
+        }
+    }
+
     /**
      * Adds a chess piece to the chessboard
      * CS240 Interface Method (name cannot be changed)
@@ -22,6 +32,12 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
         squares[position.getRow() - 1][position.getColumn() - 1] = piece;
+    }
+
+
+    // TASK: add Javadoc
+    public void clearPosition(ChessPosition position) {
+        squares[position.getRow() - 1][position.getColumn() - 1] = null;
     }
 
     /**
@@ -50,6 +66,22 @@ public class ChessBoard {
         insertRowOfPawns(ChessGame.TeamColor.BLACK);
         insertRowOfPawns(ChessGame.TeamColor.WHITE);
         insertRowOfSpecialPieces(ChessGame.TeamColor.WHITE);
+    }
+
+
+    // TASK: Create JavaDoc
+    protected ChessPosition getKingPosition(ChessGame.TeamColor teamColor) {
+        for (int curRow = 1; curRow < 9; curRow++) {
+            for (int curCol = 1; curCol < 9; curCol++) {
+                ChessPosition curPosition = new ChessPosition(curRow, curCol);
+                ChessPiece curPiece = getPiece(curPosition);
+                if (curPiece.getPieceType() == ChessPiece.PieceType.KING && curPiece.getTeamColor() == teamColor) {
+                    return curPosition;
+                }
+            }
+        }
+        System.out.println("ERROR: getKingPosition() didn't find the king");
+        return null;
     }
 
     /**

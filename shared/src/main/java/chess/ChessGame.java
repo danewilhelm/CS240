@@ -1,6 +1,9 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+
+import static chess.ChessPiece.PieceType.KING;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -56,7 +59,23 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        // if there is no piece at startPosition, return null
+        ChessPiece myPiece = board.getPiece(startPosition);
+        if (myPiece == null) {
+            return null;
+        }
+
+        // get possible moves
+        Collection<ChessMove> possibleMoves = myPiece.pieceMoves(board, startPosition);
+
+        // try each possible move to see if it's valid
+        Collection<ChessMove> allValidMoves = new ArrayList<>();
+        for (ChessMove currentMove : possibleMoves) {
+            if (isValidMove(currentMove)) {
+                allValidMoves.add(currentMove);
+            }
+        }
+        return allValidMoves;
     }
 
     /**
@@ -67,7 +86,36 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        // store the piece
+        ChessPiece movingPiece = board.getPiece(move.getStartPosition());
+
+        // clear the start and end positions (even if the end position was already empty)
+        // then place the piece at the end position
+        board.clearPosition(move.getStartPosition());
+        board.clearPosition(move.getEndPosition());
+        board.addPiece(move.getEndPosition(), movingPiece);
+
+        // if this move put the king in check, it is not a valid move
+        if (isInCheck(teamTurn)) {
+            throw new InvalidMoveException("This live move is invalid");
+        }
+    }
+
+    private boolean isValidMove(ChessMove move) {
+        // use a duplicate board for testing
+        ChessBoard testBoard = new ChessBoard(board);
+        ChessBoard liveBoard = board;
+        board = testBoard;
+
+        // test the move
+        try {
+            makeMove(move);
+            board = liveBoard;
+            return true;
+        } catch (InvalidMoveException ex) {
+            board = liveBoard;
+            return false;
+        }
     }
 
     /**
@@ -78,7 +126,32 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        for (int curRow = 1; curRow < 9; curRow++) {
+            for (int curCol = 1; curCol < 9; curCol++) {
+                ChessPosition curPosition = new ChessPosition(curRow, curCol);
+                ChessPiece curPiece = board.getPiece(curPosition);
+                // if it is an opposing piece and that piece can capture the king, then it is in check
+                if (curPiece != null && curPiece.getTeamColor() != teamColor) {
+                    if (canCaptureKing(curPosition)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean canCaptureKing(ChessPosition curPosition) {
+        ChessPiece curPiece = board.getPiece(curPosition);
+
+        Collection<ChessMove> allValidMoves = validMoves(curPosition);
+        for (ChessMove validMove : allValidMoves) {
+            ChessPiece enemyPiece = board.getPiece(validMove.getEndPosition());
+            if (enemyPiece != null && enemyPiece.getPieceType() == KING) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
