@@ -22,7 +22,7 @@ public class ChessGame {
         this.board = new ChessBoard();
         this.teamTurn = TeamColor.WHITE;
     }
-
+    // ----------------------------------------- Getters, Setters, & Enum ----------------------------------------------------
     /**
      * Gets which teams turn it is
      * CS240 Interface Method (name cannot be changed)
@@ -44,6 +44,26 @@ public class ChessGame {
     }
 
     /**
+     * Sets this game's chessboard with a given board
+     * CS240 Interface Method (name cannot be changed)
+     *
+     * @param board the new board to use
+     */
+    public void setBoard(ChessBoard board) {
+        this.board = board;
+    }
+
+    /**
+     * Gets the current chessboard
+     * CS240 Interface Method (name cannot be changed)
+     *
+     * @return the chessboard
+     */
+    public ChessBoard getBoard() {
+        return this.board;
+    }
+
+    /**
      * Enum identifying the 2 possible teams in a chess game
      * CS240 Interface Method (name cannot be changed)
      */
@@ -51,6 +71,8 @@ public class ChessGame {
         WHITE,
         BLACK
     }
+
+    // ----------------------------------------- Move Methods (Main)----------------------------------------------------
 
     /**
      * Gets a valid moves for a piece at the given location
@@ -106,14 +128,8 @@ public class ChessGame {
         switchTeamTurn();
     }
 
-    private void switchTeamTurn() {
-        // switch the teamTurn
-        if (teamTurn == TeamColor.WHITE) {
-            teamTurn = TeamColor.BLACK;
-        } else {
-            teamTurn = TeamColor.WHITE;
-        }
-    }
+    // ----------------------------------------- Move Methods (Helper) ----------------------------------------------------
+
 
     private boolean isValidMove(ChessMove move) {
         ChessPiece movingPiece = board.getPiece(move.getStartPosition());
@@ -138,6 +154,18 @@ public class ChessGame {
         }
     }
 
+    private void switchTeamTurn() {
+        // switch the teamTurn
+        if (teamTurn == TeamColor.WHITE) {
+            teamTurn = TeamColor.BLACK;
+        } else {
+            teamTurn = TeamColor.WHITE;
+        }
+    }
+
+
+    // ----------------------------------------- Game Status Methods (Main) ---------------------------------------------------
+
     /**
      * Determines if the given team is in check
      * CS240 Interface Method (name cannot be changed)
@@ -153,24 +181,6 @@ public class ChessGame {
                 if (isEnemyPiece(teamColor, curPosition) && canCaptureKing(curPosition)) {
                     return true;
                 }
-            }
-        }
-        return false;
-    }
-
-    private boolean isEnemyPiece(TeamColor teamColor, ChessPosition position) {
-        ChessPiece piece = board.getPiece(position);
-        return piece != null && piece.getTeamColor() != teamColor;
-    }
-
-    private boolean canCaptureKing(ChessPosition position) {
-        ChessPiece curPiece = board.getPiece(position);
-
-        Collection<ChessMove> allPossibleMoves = curPiece.pieceMoves(board, position);
-        for (ChessMove possibleMove : allPossibleMoves) {
-            ChessPiece enemyPiece = board.getPiece(possibleMove.getEndPosition());
-            if (enemyPiece != null && enemyPiece.getPieceType() == KING) {
-                return true;
             }
         }
         return false;
@@ -195,12 +205,6 @@ public class ChessGame {
         return true;
     }
 
-    private boolean hasValidMoves(ChessPosition position) {
-        Collection<ChessMove> allValidMoves = validMoves(position);
-        return allValidMoves != null && !allValidMoves.isEmpty();
-    }
-
-
     /**
      * Determines if the given team is in stalemate, which here is defined as having
      * no valid moves
@@ -213,23 +217,28 @@ public class ChessGame {
         throw new RuntimeException("Not implemented");
     }
 
-    /**
-     * Sets this game's chessboard with a given board
-     * CS240 Interface Method (name cannot be changed)
-     *
-     * @param board the new board to use
-     */
-    public void setBoard(ChessBoard board) {
-        this.board = board;
+    // ----------------------------------------- Game Status Methods (Helper) ---------------------------------------------------
+
+    private boolean isEnemyPiece(TeamColor teamColor, ChessPosition position) {
+        ChessPiece piece = board.getPiece(position);
+        return piece != null && piece.getTeamColor() != teamColor;
     }
 
-    /**
-     * Gets the current chessboard
-     * CS240 Interface Method (name cannot be changed)
-     *
-     * @return the chessboard
-     */
-    public ChessBoard getBoard() {
-        return this.board;
+    private boolean canCaptureKing(ChessPosition position) {
+        ChessPiece curPiece = board.getPiece(position);
+
+        Collection<ChessMove> allPossibleMoves = curPiece.pieceMoves(board, position);
+        for (ChessMove possibleMove : allPossibleMoves) {
+            ChessPiece enemyPiece = board.getPiece(possibleMove.getEndPosition());
+            if (enemyPiece != null && enemyPiece.getPieceType() == KING) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasValidMoves(ChessPosition position) {
+        Collection<ChessMove> allValidMoves = validMoves(position);
+        return allValidMoves != null && !allValidMoves.isEmpty();
     }
 }
