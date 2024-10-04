@@ -215,7 +215,15 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        for (int curRow = 1; curRow < 9; curRow++) {
+            for (int curCol = 1; curCol < 9; curCol++) {
+                ChessPosition curPosition = new ChessPosition(curRow, curCol);
+                if (! isEnemyPiece(teamColor, curPosition) && hasValidMoves(curPosition)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     // ----------------------------------------- Game Status Methods (Helper) ---------------------------------------------------
