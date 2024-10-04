@@ -17,7 +17,7 @@ public class ChessBoard {
         for (int curRow = 1; curRow < 9; curRow++) {
             for (int curCol = 1; curCol < 9; curCol++) {
                 ChessPosition curPosition = new ChessPosition(curRow, curCol);
-                ChessPiece curPiece = getPiece(curPosition);
+                ChessPiece curPiece = otherBoard.getPiece(curPosition);
                 addPiece(curPosition, curPiece);
             }
         }
