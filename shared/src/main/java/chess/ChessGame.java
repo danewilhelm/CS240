@@ -21,7 +21,6 @@ public class ChessGame {
     public ChessGame() {
         this.board = new ChessBoard();
         this.board.resetBoard();
-        System.out.println(board);
         this.teamTurn = TeamColor.WHITE;
     }
     // ----------------------------------------- Getters, Setters, & Enum ----------------------------------------------------

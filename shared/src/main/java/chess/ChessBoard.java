@@ -31,13 +31,13 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow() - 1][position.getColumn() - 1] = piece;
+        squares[8 - position.getRow()][position.getColumn() - 1] = piece;
     }
 
 
     // TASK: add Javadoc
     public void clearPosition(ChessPosition position) {
-        squares[position.getRow() - 1][position.getColumn() - 1] = null;
+        squares[8 - position.getRow()][position.getColumn() - 1] = null;
     }
 
     /**
@@ -49,7 +49,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return squares[position.getRow() - 1][position.getColumn() - 1];
+        return squares[8 - position.getRow()][position.getColumn() - 1];
     }
 
     /**
@@ -70,19 +70,19 @@ public class ChessBoard {
 
 
     // TASK: Create JavaDoc
-    protected ChessPosition getKingPosition(ChessGame.TeamColor teamColor) {
-        for (int curRow = 1; curRow < 9; curRow++) {
-            for (int curCol = 1; curCol < 9; curCol++) {
-                ChessPosition curPosition = new ChessPosition(curRow, curCol);
-                ChessPiece curPiece = getPiece(curPosition);
-                if (curPiece.getPieceType() == ChessPiece.PieceType.KING && curPiece.getTeamColor() == teamColor) {
-                    return curPosition;
-                }
-            }
-        }
-        System.out.println("ERROR: getKingPosition() didn't find the king");
-        return null;
-    }
+//    protected ChessPosition getKingPosition(ChessGame.TeamColor teamColor) {
+//        for (int curRow = 1; curRow < 9; curRow++) {
+//            for (int curCol = 1; curCol < 9; curCol++) {
+//                ChessPosition curPosition = new ChessPosition(curRow, curCol);
+//                ChessPiece curPiece = getPiece(curPosition);
+//                if (curPiece.getPieceType() == ChessPiece.PieceType.KING && curPiece.getTeamColor() == teamColor) {
+//                    return curPosition;
+//                }
+//            }
+//        }
+//        System.out.println("ERROR: getKingPosition() didn't find the king");
+//        return null;
+//    }
 
     /**
      * Inserts a row of pawns based on the given color
@@ -147,7 +147,7 @@ public class ChessBoard {
     @Override
     public String toString() {
         String stringBoard = "";
-        for (int curRow = 1; curRow < 9; curRow++) {
+        for (int curRow = 8; curRow > 0; curRow--) {
             for (int curCol = 1; curCol < 9; curCol++) {
                 stringBoard = stringBoard.concat("|");
                 ChessPosition curPosition = new ChessPosition(curRow, curCol);
