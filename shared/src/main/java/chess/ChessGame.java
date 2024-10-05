@@ -1,8 +1,6 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Collection;
 
 import static chess.ChessPiece.PieceType.KING;
@@ -114,16 +112,48 @@ public class ChessGame {
         // store the piece
         ChessPiece movingPiece = board.getPiece(move.getStartPosition());
 
-        // The move is illegal if it's not the team turn OR it's an invalid move
-        if (movingPiece.getTeamColor() != teamTurn || ! isValidMove(move)) {
-            throw new InvalidMoveException("This move is illegal");
+        /*
+            The move is illegal if:
+                The start position is empty
+                It breaks the move ruleset for that piece type
+                The end position contains a friendly piece
+                It is not your turn
+                The move results in your king in check
+         */
+
+        if (movingPiece == null) {
+            throw new InvalidMoveException("The piece attempting to move does not exist");
+        }
+
+        Collection<ChessMove> possiblePieceMoves = movingPiece.pieceMoves(board, move.getStartPosition());
+        if (! possiblePieceMoves.contains(move)) {
+            throw new InvalidMoveException("This move breaks the move ruleset for this piece type");
+        }
+
+        if (isFriendlyPiece(move.getEndPosition(), movingPiece.getTeamColor())) {
+            throw new InvalidMoveException("This move is attempting to capture a friendly piece");
+        }
+
+        if (movingPiece.getTeamColor() != teamTurn) {
+            throw new InvalidMoveException("This move cannot be made on the opponent's turn");
+        }
+
+        if (! isValidMove(move)) {
+            throw new InvalidMoveException("This move results in a check");
         }
 
         // clear the start and end positions (even if the end position was already empty)
-        // then place the piece at the end position
         board.clearPosition(move.getStartPosition());
         board.clearPosition(move.getEndPosition());
+
+        // if it's a pawn being promoted, change the piece to be added
+        if (move.getPromotionPiece() != null) {
+            movingPiece = new ChessPiece(movingPiece.getTeamColor(), move.getPromotionPiece());
+        }
+
+        // place the piece at the end position
         board.addPiece(move.getEndPosition(), movingPiece);
+
 
         // it is now the opponent's turn
         switchTeamTurn();
@@ -134,6 +164,7 @@ public class ChessGame {
 
     private boolean isValidMove(ChessMove move) {
         ChessPiece movingPiece = board.getPiece(move.getStartPosition());
+
 
         // use a duplicate board for testing
         ChessBoard testBoard = new ChessBoard(board);
@@ -179,7 +210,7 @@ public class ChessGame {
             for (int curCol = 1; curCol < 9; curCol++) {
                 ChessPosition curPosition = new ChessPosition(curRow, curCol);
 
-                if (isEnemyPiece(teamColor, curPosition) && canCaptureKing(curPosition)) {
+                if (isEnemyPiece(curPosition, teamColor) && canCaptureKing(curPosition)) {
                     return true;
                 }
             }
@@ -198,7 +229,7 @@ public class ChessGame {
         for (int curRow = 1; curRow < 9; curRow++) {
             for (int curCol = 1; curCol < 9; curCol++) {
                 ChessPosition curPosition = new ChessPosition(curRow, curCol);
-                if (! isEnemyPiece(teamColor, curPosition) && hasValidMoves(curPosition)) {
+                if (isFriendlyPiece(curPosition, teamColor) && hasValidMoves(curPosition)) {
                     return false;
                 }
             }
@@ -215,10 +246,14 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+        if (isInCheck(teamColor)) {
+            return false;
+        }
+
         for (int curRow = 1; curRow < 9; curRow++) {
             for (int curCol = 1; curCol < 9; curCol++) {
                 ChessPosition curPosition = new ChessPosition(curRow, curCol);
-                if (! isEnemyPiece(teamColor, curPosition) && hasValidMoves(curPosition)) {
+                if (isFriendlyPiece(curPosition, teamColor) && hasValidMoves(curPosition)) {
                     return false;
                 }
             }
@@ -228,9 +263,14 @@ public class ChessGame {
 
     // ----------------------------------------- Game Status Methods (Helper) ---------------------------------------------------
 
-    private boolean isEnemyPiece(TeamColor teamColor, ChessPosition position) {
+    private boolean isEnemyPiece(ChessPosition position, TeamColor teamColor) {
         ChessPiece piece = board.getPiece(position);
         return piece != null && piece.getTeamColor() != teamColor;
+    }
+
+    private boolean isFriendlyPiece(ChessPosition position, TeamColor teamColor) {
+        ChessPiece piece = board.getPiece(position);
+        return piece != null && piece.getTeamColor() == teamColor;
     }
 
     private boolean canCaptureKing(ChessPosition position) {
