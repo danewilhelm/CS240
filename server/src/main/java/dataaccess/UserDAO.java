@@ -1,5 +1,7 @@
 package dataaccess;
 
+import model.UserData;
+
 public interface UserDAO {
     /*
     INTERFACE CLASS
@@ -8,4 +10,8 @@ public interface UserDAO {
     createUser: Create a new user.
     getUser: Retrieve a user with the given username.
      */
+
+    public void clear();
+    public void createUser(UserData newUser);
+    public UserData getUser(String username);
 }

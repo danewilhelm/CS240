@@ -2,32 +2,31 @@ package dataaccess;
 
 import model.AuthData;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class AuthMemoryDAO implements AuthDAO {
 
-    Map<String, AuthData> authMap = new HashMap<>();
+    Map<String, AuthData> authDataMap = new HashMap<>();
 
 
     @Override
     public void clear() {
-        authMap.clear();
+        authDataMap.clear();
     }
 
     @Override
     public void createAuth(AuthData authData) {
-        authMap.put(authData.authToken(), authData);
+        authDataMap.put(authData.authToken(), authData);
     }
 
     @Override
     public AuthData getAuth(String authToken) {
-        return authMap.get(authToken);
+        return authDataMap.get(authToken);
     }
 
     @Override
     public void deleteAuth(String authToken) {
-        authMap.remove(authToken);
+        authDataMap.remove(authToken);
     }
 }
