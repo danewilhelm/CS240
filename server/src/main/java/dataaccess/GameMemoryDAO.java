@@ -7,9 +7,10 @@ import java.util.*;
 
 public class GameMemoryDAO implements GameDAO {
 
+    public static final GameMemoryDAO instance = new GameMemoryDAO();
+    private final Map<Integer, GameData> gameDataMap = new HashMap<>();
 
 
-    Map<Integer, GameData> gameDataMap = new HashMap<>();
     @Override
     public void clear() {
         gameDataMap.clear();

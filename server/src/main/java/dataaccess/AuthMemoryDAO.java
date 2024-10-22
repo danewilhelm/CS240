@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AuthMemoryDAO implements AuthDAO {
-
-    Map<String, AuthData> authDataMap = new HashMap<>();
+    public static final AuthMemoryDAO instance = new AuthMemoryDAO();
+    private final Map<String, AuthData> authDataMap = new HashMap<>();
 
 
     @Override
