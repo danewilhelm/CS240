@@ -17,10 +17,11 @@ public class GameMemoryDAO implements GameDAO {
     }
 
     @Override
-    public void createGame(String gameName) {
+    public int createGame(String gameName) {
         int newGameID = generateGameID(gameName);
         GameData newGame = new GameData(newGameID, null, null, gameName, new ChessGame());
         gameDataMap.put(newGameID, newGame);
+        return newGameID;
     }
 
     private int generateGameID (String gameName) {

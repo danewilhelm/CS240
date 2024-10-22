@@ -16,7 +16,7 @@ public interface GameDAO {
      */
 
     public void clear();
-    public void createGame(String gameName);
+    public int createGame(String gameName);
     public GameData getGame(int gameID);
     public Collection<GameData> listGames();
     public void updateGame(GameData updatedGame);

@@ -20,6 +20,6 @@ public class FakeDataGenerator {
     }
 
     public static AuthData generateCatAuth() {
-        return new AuthData("coolest authToken ever", "FelixTheCat");
+        return new AuthData("FelixTheCat", "coolest authToken ever");
     }
 }
