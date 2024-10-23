@@ -8,11 +8,9 @@ import request.ListGamesRequest;
 import request.RegisterRequest;
 import result.CreateGameResult;
 import result.ListGamesResult;
-import result.RegisterResult;
 
 
-
-public class testGameService {
+public class TestGameService {
 
     private final String catGameName = "Kitty King";
     private String felixAuthToken;
@@ -27,27 +25,32 @@ public class testGameService {
         felixAuthToken = TestUserService.exampleRegisterFelix().authToken();
     }
 
-    public CreateGameResult exampleCreateCatGame() {
+    public CreateGameResult exampleAuthAndCreateCatGame() {
         authLoaf();
         authFelix();
         CreateGameRequest createGameRequest = new CreateGameRequest(felixAuthToken, catGameName);
         return GameService.createGame(createGameRequest);
     }
 
+    public void exampleCreateKittyGame() {
+        CreateGameRequest createGameRequest = new CreateGameRequest(loafAuthToken, "Cat Pat");
+        GameService.createGame(createGameRequest);
+    }
+
 
 
     @Test
-    public void normalCreateGame() {
-        CreateGameResult createGameResult = exampleCreateCatGame();
+    public void goodCreateGame() {
+        CreateGameResult createGameResult = exampleAuthAndCreateCatGame();
         assert createGameResult.gameID() == catGameName.hashCode();
+        ClearService.clear();
     }
 
     @Test
-    public void createTwoGames() {
-        exampleCreateCatGame();
-        CreateGameRequest createGameRequest = new CreateGameRequest(loafAuthToken, "Cat Pat");
-        GameService.createGame(createGameRequest);
-
+    public void goodCreateTwoGames() {
+        exampleAuthAndCreateCatGame();
+        exampleCreateKittyGame();
+        ClearService.clear();
     }
 
     @Test
@@ -65,49 +68,67 @@ public class testGameService {
         } catch (BadRequestException e) {
             // test passed
         }
+        ClearService.clear();
     }
 
     @Test
-    public void normalWhiteJoinGame() {
-        CreateGameResult createGameResult = exampleCreateCatGame();
+    public void goodWhiteJoinGame() {
+        CreateGameResult createGameResult = exampleAuthAndCreateCatGame();
         JoinGameRequest request = new JoinGameRequest(loafAuthToken, "WHITE", createGameResult.gameID());
+        ClearService.clear();
     }
 
     @Test
-    public void normalBlackJoinGame() {
-        CreateGameResult createGameResult = exampleCreateCatGame();
+    public void goodBlackJoinGame() {
+        CreateGameResult createGameResult = exampleAuthAndCreateCatGame();
         JoinGameRequest request = new JoinGameRequest(felixAuthToken, "BLACK", createGameResult.gameID());
+        ClearService.clear();
     }
 
     @Test
-    public void doubleWhiteJoin() {
-        normalWhiteJoinGame();
+    public void badDoubleWhiteJoin() {
+        goodWhiteJoinGame();
         try {
-            normalWhiteJoinGame();
+            goodWhiteJoinGame();
         } catch (AlreadyTakenException e) {
             // passed test
         }
+        ClearService.clear();
     }
 
     @Test
-    public void doubleBlackJoin() {
-        normalBlackJoinGame();
+    public void badDoubleBlackJoin() {
+        goodBlackJoinGame();
         try {
-            normalBlackJoinGame();
+            goodBlackJoinGame();
         } catch (AlreadyTakenException e) {
             // passed test
         }
+        ClearService.clear();
     }
 
     @Test
-    public void listGames() {
-        createTwoGames();
+    public void goodListGames() {
+        exampleAuthAndCreateCatGame();
         ListGamesRequest request = new ListGamesRequest(loafAuthToken);
         ListGamesResult result = GameService.listGames(request);
-        assert result.games().size() == 2;
+        assert result.games().size() == 1;
         for (GameData game : result.games()) {
             System.out.println(game);
         }
+        ClearService.clear();
+    }
+
+    @Test
+    public void badListGames() {
+        exampleAuthAndCreateCatGame();
+        ListGamesRequest request = new ListGamesRequest("wrong auth");
+        try {
+            ListGamesResult result = GameService.listGames(request);
+        } catch (UnauthorizedException e) {
+            // test passed
+        }
+        ClearService.clear();
     }
 
 

@@ -1,6 +1,5 @@
 package service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import request.LoginRequest;
 import request.LogoutRequest;
@@ -19,25 +18,26 @@ public class TestUserService {
     }
 
     @Test
-    public void normalRegister() {
+    public void goodRegister() {
         RegisterResult actual = exampleRegisterFelix();
         assert actual.authToken() != null;
         assert actual.username().equals(felixUsername);
-
+        ClearService.clear();
     }
 
     @Test
-    public void registerWhenAlreadyRegistered() {
+    public void badRegisterWhenAlreadyRegistered() {
         exampleRegisterFelix();
         try {
             exampleRegisterFelix();
         } catch (AlreadyTakenException e) {
             // test passed
         }
+        ClearService.clear();
     }
 
     @Test
-    public void normalLogin() {
+    public void goodLogin() {
         exampleRegisterFelix();
 
         LoginRequest request = new LoginRequest(felixUsername, felixPassword);
@@ -45,6 +45,7 @@ public class TestUserService {
 
         assert actual.authToken() != null;
         assert actual.username().equals(felixUsername);
+        ClearService.clear();
     }
 
     @Test
@@ -70,10 +71,11 @@ public class TestUserService {
     }
 
     @Test
-    public void normalLogout() {
+    public void goodLogout() {
         String authToken = exampleRegisterFelix().authToken();
         LogoutRequest request = new LogoutRequest(authToken);
         UserService.logout(request);
+        ClearService.clear();
     }
 
     @Test
@@ -85,6 +87,7 @@ public class TestUserService {
         } catch (UnauthorizedException e) {
             // test passed
         }
+        ClearService.clear();
     }
 
 

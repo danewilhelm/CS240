@@ -16,6 +16,4 @@ public class TestClearService {
         assert GameMemoryDAO.instance.listGames().isEmpty();
         assert AuthMemoryDAO.instance.getAuth("coolest authToken ever") == null;
     }
-
-
 }
