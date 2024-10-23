@@ -9,10 +9,10 @@ import model.UserData;
 public class FakeDataGenerator {
 
     public static void createDataInMemory() {
-        UserMemoryDAO.instance.createUser(generateCatUserData());
-        GameMemoryDAO.instance.createGame("1st chess match ever");
-        GameMemoryDAO.instance.createGame("2nd chess match ever");
-        AuthMemoryDAO.instance.createAuth(generateCatAuth());
+        UserMemoryDAO.INSTANCE.createUser(generateCatUserData());
+        GameMemoryDAO.INSTANCE.createGame("1st chess match ever");
+        GameMemoryDAO.INSTANCE.createGame("2nd chess match ever");
+        AuthMemoryDAO.INSTANCE.createAuth(generateCatAuth());
     }
 
     public static UserData generateCatUserData() {

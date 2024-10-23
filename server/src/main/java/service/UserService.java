@@ -21,39 +21,39 @@ public class UserService {
             throw new BadRequestException("Error: bad request");
         }
 
-        if (UserMemoryDAO.instance.getUser(request.username()) != null) {
+        if (UserMemoryDAO.INSTANCE.getUser(request.username()) != null) {
             throw new AlreadyTakenException("Error: already taken");
         }
 
         UserData user = new UserData(request.username(), request.password(), request.email());
-        UserMemoryDAO.instance.createUser(user);
+        UserMemoryDAO.INSTANCE.createUser(user);
 
         String authToken = UUID.randomUUID().toString();
         AuthData auth = new AuthData(request.username(), authToken);
-        AuthMemoryDAO.instance.createAuth(auth);
+        AuthMemoryDAO.INSTANCE.createAuth(auth);
 
         return new RegisterResult(request.username(), authToken);
     }
 
     public static LoginResult login(LoginRequest request) {
-        UserData attemptedUser = UserMemoryDAO.instance.getUser(request.username());
+        UserData attemptedUser = UserMemoryDAO.INSTANCE.getUser(request.username());
         if (attemptedUser == null || ! attemptedUser.password().equals(request.password())) {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
         String authToken = UUID.randomUUID().toString();
         AuthData auth = new AuthData(request.username(), authToken);
-        AuthMemoryDAO.instance.createAuth(auth);
+        AuthMemoryDAO.INSTANCE.createAuth(auth);
 
         return new LoginResult(request.username(), authToken);
     }
 
     public static LogoutResult logout(LogoutRequest request) {
-        if (AuthMemoryDAO.instance.getAuth(request.authToken()) == null) {
+        if (AuthMemoryDAO.INSTANCE.getAuth(request.authToken()) == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
-        AuthMemoryDAO.instance.deleteAuth(request.authToken());
+        AuthMemoryDAO.INSTANCE.deleteAuth(request.authToken());
         return new LogoutResult();
     }
 }

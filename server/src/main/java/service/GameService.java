@@ -11,8 +11,6 @@ import result.CreateGameResult;
 import result.JoinGameResult;
 import result.ListGamesResult;
 
-import java.util.Collection;
-
 
 public class GameService {
     /*
@@ -27,11 +25,11 @@ public class GameService {
             throw new BadRequestException("Error: bad request");
         }
 
-        if (AuthMemoryDAO.instance.getAuth(request.authToken()) == null) {
+        if (AuthMemoryDAO.INSTANCE.getAuth(request.authToken()) == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
-        int gameID = GameMemoryDAO.instance.createGame(request.gameName());
+        int gameID = GameMemoryDAO.INSTANCE.createGame(request.gameName());
         return new CreateGameResult(gameID);
     }
 
@@ -41,12 +39,12 @@ public class GameService {
             throw new BadRequestException("Error: invalid teamColor given");
         }
 
-        AuthData auth = AuthMemoryDAO.instance.getAuth(request.authToken());
+        AuthData auth = AuthMemoryDAO.INSTANCE.getAuth(request.authToken());
         if (auth == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
-        GameData oldGame = GameMemoryDAO.instance.getGame(request.gameID());
+        GameData oldGame = GameMemoryDAO.INSTANCE.getGame(request.gameID());
         if (oldGame == null) {
             throw new BadRequestException("Error: game does not exist");
         }
@@ -65,17 +63,17 @@ public class GameService {
             }
             updatedGame = new GameData(oldGame.gameID(), oldGame.whiteUsername(), auth.username(), oldGame.gameName(), oldGame.game());
         }
-        GameMemoryDAO.instance.updateGame(updatedGame);
+        GameMemoryDAO.INSTANCE.updateGame(updatedGame);
 
         return new JoinGameResult();
     }
 
     public static ListGamesResult listGames(ListGamesRequest request) {
-        if (AuthMemoryDAO.instance.getAuth(request.authToken()) == null) {
+        if (AuthMemoryDAO.INSTANCE.getAuth(request.authToken()) == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
-        return new ListGamesResult(GameMemoryDAO.instance.listGames());
+        return new ListGamesResult(GameMemoryDAO.INSTANCE.listGames());
     }
 
 

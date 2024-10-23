@@ -82,13 +82,13 @@ public class PieceMovesCalculator {
      * @return All possible moves in diagonal directions
      */
     protected Collection<ChessMove> exploreAllDiagonals() {
-        Collection<Collection<ChessMove>> NestedCollection = new ArrayList<>();
-        NestedCollection.add(exploreDirectionAcrossBoard(1, 1));
-        NestedCollection.add(exploreDirectionAcrossBoard(-1, 1));
-        NestedCollection.add(exploreDirectionAcrossBoard(-1, -1));
-        NestedCollection.add(exploreDirectionAcrossBoard(1, -1));
+        Collection<Collection<ChessMove>> nestedCollection = new ArrayList<>();
+        nestedCollection.add(exploreDirectionAcrossBoard(1, 1));
+        nestedCollection.add(exploreDirectionAcrossBoard(-1, 1));
+        nestedCollection.add(exploreDirectionAcrossBoard(-1, -1));
+        nestedCollection.add(exploreDirectionAcrossBoard(1, -1));
 
-        return mergeChessMoveCollections(NestedCollection);
+        return mergeChessMoveCollections(nestedCollection);
     }
 
     /**
@@ -98,13 +98,13 @@ public class PieceMovesCalculator {
      * @return All possible moves in straight directions
      */
     protected Collection<ChessMove> exploreAllStraights() {
-        Collection<Collection<ChessMove>> NestedCollection = new ArrayList<>();
-        NestedCollection.add(exploreDirectionAcrossBoard(1, 0));
-        NestedCollection.add(exploreDirectionAcrossBoard(0, 1));
-        NestedCollection.add(exploreDirectionAcrossBoard(-1, 0));
-        NestedCollection.add(exploreDirectionAcrossBoard(0, -1));
+        Collection<Collection<ChessMove>> nestedCollection = new ArrayList<>();
+        nestedCollection.add(exploreDirectionAcrossBoard(1, 0));
+        nestedCollection.add(exploreDirectionAcrossBoard(0, 1));
+        nestedCollection.add(exploreDirectionAcrossBoard(-1, 0));
+        nestedCollection.add(exploreDirectionAcrossBoard(0, -1));
 
-        return mergeChessMoveCollections(NestedCollection);
+        return mergeChessMoveCollections(nestedCollection);
     }
 
     // --------------------Exploring Positions (King, Knight)-------------------------

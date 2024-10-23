@@ -68,22 +68,6 @@ public class ChessBoard {
         insertRowOfSpecialPieces(ChessGame.TeamColor.WHITE);
     }
 
-
-    // TASK: Create JavaDoc
-//    protected ChessPosition getKingPosition(ChessGame.TeamColor teamColor) {
-//        for (int curRow = 1; curRow < 9; curRow++) {
-//            for (int curCol = 1; curCol < 9; curCol++) {
-//                ChessPosition curPosition = new ChessPosition(curRow, curCol);
-//                ChessPiece curPiece = getPiece(curPosition);
-//                if (curPiece.getPieceType() == ChessPiece.PieceType.KING && curPiece.getTeamColor() == teamColor) {
-//                    return curPosition;
-//                }
-//            }
-//        }
-//        System.out.println("ERROR: getKingPosition() didn't find the king");
-//        return null;
-//    }
-
     /**
      * Inserts a row of pawns based on the given color
      * A helper method for resetBoard()

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class UserMemoryDAO implements UserDAO {
-    public static final UserMemoryDAO instance = new UserMemoryDAO();
+    public static final UserMemoryDAO INSTANCE = new UserMemoryDAO();
     private final Map<String, UserData> userDataMap = new HashMap<>();
 
     @Override

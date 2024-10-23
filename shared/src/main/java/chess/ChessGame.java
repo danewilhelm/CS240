@@ -226,8 +226,8 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        for (int curRow = 1; curRow < 9; curRow++) {
-            for (int curCol = 1; curCol < 9; curCol++) {
+        for (int curRow = 8; curRow > 0; curRow--) {
+            for (int curCol = 8; curCol > 0; curCol--) {
                 ChessPosition curPosition = new ChessPosition(curRow, curCol);
                 if (isFriendlyPiece(curPosition, teamColor) && hasValidMoves(curPosition)) {
                     return false;
