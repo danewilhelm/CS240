@@ -13,8 +13,6 @@ import result.ListGamesResult;
 
 import java.util.Collection;
 
-import static chess.ChessGame.TeamColor.WHITE;
-import static chess.ChessGame.TeamColor.BLACK;
 
 public class GameService {
     /*
@@ -38,8 +36,9 @@ public class GameService {
     }
 
     public static JoinGameResult joinGame(JoinGameRequest request) {
-        if (!(request.playerColor().equals(WHITE) || request.playerColor().equals(BLACK))) {
-            throw new BadRequestException("Error: bad request");
+
+        if (request.playerColor() == null || !(request.playerColor().equals("WHITE") || request.playerColor().equals("BLACK"))) {
+            throw new BadRequestException("Error: invalid teamColor given");
         }
 
         AuthData auth = AuthMemoryDAO.instance.getAuth(request.authToken());
@@ -49,13 +48,21 @@ public class GameService {
 
         GameData oldGame = GameMemoryDAO.instance.getGame(request.gameID());
         if (oldGame == null) {
-            throw new BadRequestException("Error: bad request");
+            throw new BadRequestException("Error: game does not exist");
         }
 
+
+
         GameData updatedGame;
-        if (request.playerColor().equals(WHITE)) {
+        if (request.playerColor().equals("WHITE")) {
+            if (oldGame.whiteUsername() != null) {
+                throw new AlreadyTakenException("Error: this team is already chosen");
+            }
             updatedGame = new GameData(oldGame.gameID(), auth.username(), oldGame.blackUsername(), oldGame.gameName(), oldGame.game());
         } else {
+            if (oldGame.blackUsername() != null) {
+                throw new AlreadyTakenException("Error: this team is already chosen");
+            }
             updatedGame = new GameData(oldGame.gameID(), oldGame.whiteUsername(), auth.username(), oldGame.gameName(), oldGame.game());
         }
         GameMemoryDAO.instance.updateGame(updatedGame);

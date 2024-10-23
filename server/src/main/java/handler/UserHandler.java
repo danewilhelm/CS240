@@ -31,10 +31,10 @@ public class UserHandler {
             return serializer.toJson(registerResult);
         } catch (BadRequestException e) {
             response.status(400);
-            return serializer.toJson("{ \"message\": \"" + e.getMessage() + "\" }");
+            return "{ \"message\": \"" + e.getMessage() + "\" }";
         } catch (AlreadyTakenException e) {
             response.status(403);
-            return serializer.toJson("{ \"message\": \"" + e.getMessage() + "\" }");
+            return "{ \"message\": \"" + e.getMessage() + "\" }";
         }
     }
 
@@ -47,10 +47,10 @@ public class UserHandler {
             return serializer.toJson(loginResult);
         } catch (BadRequestException e) {
             response.status(400);
-            return serializer.toJson("{ \"message\": \"" + e.getMessage() + "\" }");
+            return "{ \"message\": \"" + e.getMessage() + "\" }";
         } catch (UnauthorizedException e) {
             response.status(401);
-            return serializer.toJson("{ \"message\": \"" + e.getMessage() + "\" }");
+            return "{ \"message\": \"" + e.getMessage() + "\" }";
         }
     }
 
@@ -62,13 +62,13 @@ public class UserHandler {
         try {
             LogoutResult logoutResult = UserService.logout(logoutRequest);
             response.status(200);
-            return serializer.toJson("{}");
+            return "{}";
         } catch (BadRequestException e) {
             response.status(400);
-            return serializer.toJson("{ \"message\": \"" + e.getMessage() + "\" }");
+            return "{ \"message\": \"" + e.getMessage() + "\" }";
         } catch (UnauthorizedException e) {
             response.status(401);
-            return serializer.toJson("{ \"message\": \"" + e.getMessage() + "\" }");
+            return "{ \"message\": \"" + e.getMessage() + "\" }";
         }
     }
 }

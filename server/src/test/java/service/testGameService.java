@@ -10,8 +10,7 @@ import result.CreateGameResult;
 import result.ListGamesResult;
 import result.RegisterResult;
 
-import static chess.ChessGame.TeamColor.WHITE;
-import static chess.ChessGame.TeamColor.BLACK;
+
 
 public class testGameService {
 
@@ -71,13 +70,13 @@ public class testGameService {
     @Test
     public void normalWhiteJoinGame() {
         CreateGameResult createGameResult = exampleCreateCatGame();
-        JoinGameRequest request = new JoinGameRequest(loafAuthToken, WHITE, createGameResult.gameID());
+        JoinGameRequest request = new JoinGameRequest(loafAuthToken, "WHITE", createGameResult.gameID());
     }
 
     @Test
     public void normalBlackJoinGame() {
         CreateGameResult createGameResult = exampleCreateCatGame();
-        JoinGameRequest request = new JoinGameRequest(felixAuthToken, BLACK, createGameResult.gameID());
+        JoinGameRequest request = new JoinGameRequest(felixAuthToken, "BLACK", createGameResult.gameID());
     }
 
     @Test
