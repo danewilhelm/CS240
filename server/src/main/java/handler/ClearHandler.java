@@ -13,7 +13,7 @@ public class ClearHandler {
 
     public static Object handleClear(Request request, Response response) {
         Gson serializer = new Gson();
-//        var gsonClearRequest = serializer.fromJson(request, Clear)
+//        ClearRequest clearRequest = serializer.fromJson(request, Clear)
         ClearResult resultObj = ClearService.clear();
         response.status(200);
         return serializer.toJson(resultObj);
