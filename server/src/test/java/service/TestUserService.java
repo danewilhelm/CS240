@@ -8,12 +8,12 @@ import result.LoginResult;
 import result.RegisterResult;
 
 public class TestUserService {
-    static final String felixUsername = "FelixTheCat";
-    static final String felixPassword = "123456";
-    static final String felixEmail = "rando@gmail.com";
+    static final String FELIX_THE_CAT = "FelixTheCat";
+    static final String FELIX_PASSWORD = "123456";
+    static final String FELIX_EMAIL = "rando@gmail.com";
 
     public static RegisterResult exampleRegisterFelix() {
-        RegisterRequest request = new RegisterRequest(felixUsername, felixPassword, felixEmail);
+        RegisterRequest request = new RegisterRequest(FELIX_THE_CAT, FELIX_PASSWORD, FELIX_EMAIL);
         return UserService.register(request);
     }
 
@@ -21,7 +21,7 @@ public class TestUserService {
     public void goodRegister() {
         RegisterResult actual = exampleRegisterFelix();
         assert actual.authToken() != null;
-        assert actual.username().equals(felixUsername);
+        assert actual.username().equals(FELIX_THE_CAT);
         ClearService.clear();
     }
 
@@ -40,11 +40,11 @@ public class TestUserService {
     public void goodLogin() {
         exampleRegisterFelix();
 
-        LoginRequest request = new LoginRequest(felixUsername, felixPassword);
+        LoginRequest request = new LoginRequest(FELIX_THE_CAT, FELIX_PASSWORD);
         LoginResult actual = UserService.login(request);
 
         assert actual.authToken() != null;
-        assert actual.username().equals(felixUsername);
+        assert actual.username().equals(FELIX_THE_CAT);
         ClearService.clear();
     }
 
@@ -52,13 +52,13 @@ public class TestUserService {
     public void badLogin() {
         exampleRegisterFelix();
         try {
-            UserService.login(new LoginRequest(felixUsername, "wrong password"));
+            UserService.login(new LoginRequest(FELIX_THE_CAT, "wrong password"));
         } catch (UnauthorizedException e) {
             // test passed
         }
 
         try {
-            UserService.login(new LoginRequest("wrong username", felixPassword));
+            UserService.login(new LoginRequest("wrong username", FELIX_PASSWORD));
         } catch (UnauthorizedException e) {
             // test passed
         }
