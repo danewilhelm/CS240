@@ -12,22 +12,22 @@ public class GameDatabaseDAO implements GameDAO {
     }
 
     @Override
-    public int createGame(String gameName) {
+    public int createGame(String gameName) throws DataAccessException {
         return 0;
     }
 
     @Override
-    public GameData getGame(int gameID) {
+    public GameData getGame(int gameID) throws DataAccessException {
         return null;
     }
 
     @Override
-    public Collection<GameData> listGames() {
+    public Collection<GameData> listGames() throws DataAccessException {
         return List.of();
     }
 
     @Override
-    public void updateGame(GameData updatedGame) {
+    public void updateGame(GameData updatedGame) throws DataAccessException {
 
     }
 }

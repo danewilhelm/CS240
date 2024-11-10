@@ -5,22 +5,22 @@ import model.AuthData;
 public class AuthDatabaseDAO implements AuthDAO {
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException {
 
     }
 
     @Override
-    public void createAuth(AuthData authData) {
+    public void createAuth(AuthData authData) throws DataAccessException {
 
     }
 
     @Override
-    public AuthData getAuth(String authToken) {
+    public AuthData getAuth(String authToken) throws DataAccessException {
         return null;
     }
 
     @Override
-    public void deleteAuth(String authToken) {
+    public void deleteAuth(String authToken) throws DataAccessException {
 
     }
 }

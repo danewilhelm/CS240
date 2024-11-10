@@ -53,7 +53,11 @@ public class UserService {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
-        AuthMemoryDAO.INSTANCE.deleteAuth(request.authToken());
+        try {
+            AuthMemoryDAO.INSTANCE.deleteAuth(request.authToken());
+        } catch (dataaccess.DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         return new LogoutResult();
     }
 }

@@ -11,7 +11,7 @@ public interface UserDAO {
     getUser: Retrieve a user with the given username.
      */
 
-    public void clear();
-    public void createUser(UserData newUser);
-    public UserData getUser(String username);
+    public void clear() throws DataAccessException;
+    public void createUser(UserData newUser) throws DataAccessException;
+    public UserData getUser(String username) throws DataAccessException;
 }
