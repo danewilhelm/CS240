@@ -8,18 +8,18 @@ public class UserDatabaseDAO implements UserDAO {
     @Override
     public void clear() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("TRUNCATE TABLE user")) {
+            try (var preparedStatement = conn.prepareStatement("TRUNCATE TABLE userTable")) {
                 var rs = preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new DataAccessException("DataAccess Error while clearing user table: " + e.getMessage());
+            throw new DataAccessException("DataAccessException while clearing user table: " + e.getMessage());
         }
     }
 
     @Override
     public void createUser(UserData newUser) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("INSERT INTO user (username, password, email) VALUES (?, ?, ?)")) {
+            try (var preparedStatement = conn.prepareStatement("INSERT INTO userTable (username, password, email) VALUES (?, ?, ?)")) {
                 preparedStatement.setString(1, newUser.username());
                 preparedStatement.setString(2, newUser.password());
                 preparedStatement.setString(3, newUser.email());
@@ -33,13 +33,13 @@ public class UserDatabaseDAO implements UserDAO {
     @Override
     public UserData getUser(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("SELECT username, password, email FROM user WHERE username=?")) {
+            try (var preparedStatement = conn.prepareStatement("SELECT username, password, email FROM userTable WHERE username=?")) {
                 preparedStatement.setString(1, username);
                 var rs = preparedStatement.executeQuery();
                 return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
             }
         } catch (SQLException e) {
-            throw new DataAccessException("DataAccess Error while getting user: " + e.getMessage());
+            throw new DataAccessException("DataAccessException while getting user: " + e.getMessage());
         }
     }
 
