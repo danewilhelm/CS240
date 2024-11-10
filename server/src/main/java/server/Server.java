@@ -12,6 +12,12 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
+        // create instances of DAOs
+        // 1 2 3
+
+        // create instances of Handlers
+
+
         // Register your endpoints and handle exceptions here.
         establishEndpoints();
         //This line initializes the server and can be removed once you have a functioning endpoint 

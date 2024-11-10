@@ -11,7 +11,9 @@ public class ClearHandler {
     Handles 1 endpoint: clear
      */
 
-    public static Object handleClear(Request request, Response response) {
+    // constructor that stores an instance of a
+
+    public Object handleClear(Request request, Response response) {
         Gson serializer = new Gson();
 //        ClearRequest clearRequest = serializer.fromJson(request, Clear)
         ClearResult resultObj = ClearService.clear();
