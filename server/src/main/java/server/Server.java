@@ -1,5 +1,6 @@
 package server;
 
+import dataaccess.*;
 import handler.ClearHandler;
 import handler.GameHandler;
 import handler.UserHandler;
@@ -13,32 +14,31 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // create instances of DAOs
-        // 1 2 3
+        AuthDAO authDAOInstance = new AuthMemoryDAO();
+        GameDAO gameDAOInstance = new GameMemoryDAO();
+        UserDAO userDAOInstance = new UserMemoryDAO();
 
         // create instances of Handlers
-
+        ClearHandler clearHandlerInstance = new ClearHandler(authDAOInstance, gameDAOInstance, userDAOInstance);
+        GameHandler gameHandlerInstance = new GameHandler(authDAOInstance, gameDAOInstance, userDAOInstance);
+        UserHandler userHandlerInstance = new UserHandler(authDAOInstance, gameDAOInstance, userDAOInstance);
 
         // Register your endpoints and handle exceptions here.
-        establishEndpoints();
+        Spark.post("/user", userHandlerInstance::handleRegister);
+        Spark.post("/session", userHandlerInstance::handleLogin);
+        Spark.delete("/session", userHandlerInstance::handleLogout);
+
+        Spark.get("/game", gameHandlerInstance::handleListGames);
+        Spark.post("/game", gameHandlerInstance::handleCreateGame);
+        Spark.put("/game", gameHandlerInstance::handleJoinGame);
+
+        Spark.delete("/db", clearHandlerInstance::handleClear);
+
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
 
         Spark.awaitInitialization();
         return Spark.port();
-    }
-
-    private void establishEndpoints() {
-        Spark.post("/user", UserHandler::handleRegister);
-        Spark.post("/session", UserHandler::handleLogin);
-        Spark.delete("/session", UserHandler::handleLogout);
-
-        Spark.get("/game", GameHandler::handleListGames);
-        Spark.post("/game", GameHandler::handleCreateGame);
-        Spark.put("/game", GameHandler::handleJoinGame);
-
-        Spark.delete("/db", ClearHandler::handleClear);
-
-
     }
 
     public void stop() {

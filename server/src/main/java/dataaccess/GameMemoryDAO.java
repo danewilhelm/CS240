@@ -7,7 +7,6 @@ import java.util.*;
 
 public class GameMemoryDAO implements GameDAO {
 
-    public static final GameMemoryDAO INSTANCE = new GameMemoryDAO();
     private final Map<Integer, GameData> gameDataMap = new HashMap<>();
 
 

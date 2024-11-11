@@ -5,13 +5,22 @@ import dataaccess.*;
 import result.ClearResult;
 
 public class ClearService {
-    public static ClearResult clear() {
-        UserMemoryDAO.INSTANCE.clear();
-        GameMemoryDAO.INSTANCE.clear();
-        AuthMemoryDAO.INSTANCE.clear();
 
-        // if the database was not accessible, throw a DataAccessException
-        // else, return nothing
+    private AuthDAO authDAOInstance;
+    private GameDAO gameDAOInstance;
+    private UserDAO userDAOInstance;
+
+
+    public ClearService(AuthDAO authDAOInstance, GameDAO gameDAOInstance, UserDAO userDAOInstance) {
+        this.authDAOInstance = authDAOInstance;
+        this.gameDAOInstance = gameDAOInstance;
+        this.userDAOInstance = userDAOInstance;
+    }
+
+    public ClearResult clear() throws DataAccessException {
+        authDAOInstance.clear();
+        gameDAOInstance.clear();
+        userDAOInstance.clear();
         return new ClearResult();
     }
 }

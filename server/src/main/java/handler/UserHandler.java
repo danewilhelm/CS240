@@ -1,6 +1,10 @@
 package handler;
 
 import com.google.gson.Gson;
+import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
+import dataaccess.GameDAO;
+import dataaccess.UserDAO;
 import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
@@ -21,12 +25,18 @@ public class UserHandler {
         Logout
      */
 
-    public static Object handleRegister(Request request, Response response) {
+    private final UserService userServiceInstance;
+
+    public UserHandler (AuthDAO authDAOInstance, GameDAO gameDAOInstance, UserDAO userDAOInstance) {
+        userServiceInstance = new UserService(authDAOInstance, gameDAOInstance, userDAOInstance);
+    }
+
+    public Object handleRegister(Request request, Response response) {
         Gson serializer = new Gson();
         RegisterRequest registerRequest = serializer.fromJson(request.body(), RegisterRequest.class);
 
         try {
-            RegisterResult registerResult = UserService.register(registerRequest);
+            RegisterResult registerResult = userServiceInstance.register(registerRequest);
             response.status(200);
             return serializer.toJson(registerResult);
         } catch (BadRequestException e) {
@@ -35,14 +45,17 @@ public class UserHandler {
         } catch (AlreadyTakenException e) {
             response.status(403);
             return "{ \"message\": \"" + e.getMessage() + "\" }";
+        } catch (DataAccessException e) {
+            response.status(500);
+            return "{ \"message\": \"" + e.getMessage() + "\" }";
         }
     }
 
-    public static Object handleLogin(Request request, Response response) {
+    public Object handleLogin(Request request, Response response) {
         Gson serializer = new Gson();
         LoginRequest loginRequest = serializer.fromJson(request.body(), LoginRequest.class);
         try {
-            LoginResult loginResult = UserService.login(loginRequest);
+            LoginResult loginResult = userServiceInstance.login(loginRequest);
             response.status(200);
             return serializer.toJson(loginResult);
         } catch (BadRequestException e) {
@@ -51,16 +64,19 @@ public class UserHandler {
         } catch (UnauthorizedException e) {
             response.status(401);
             return "{ \"message\": \"" + e.getMessage() + "\" }";
+        } catch (DataAccessException e) {
+            response.status(500);
+            return "{ \"message\": \"" + e.getMessage() + "\" }";
         }
     }
 
 
-    public static Object handleLogout(Request request, Response response) {
+    public Object handleLogout(Request request, Response response) {
         Gson serializer = new Gson();
         LogoutRequest logoutRequest = new LogoutRequest(request.headers("authorization"));
 
         try {
-            LogoutResult logoutResult = UserService.logout(logoutRequest);
+            LogoutResult logoutResult = userServiceInstance.logout(logoutRequest);
             response.status(200);
             return "{}";
         } catch (BadRequestException e) {
@@ -68,6 +84,9 @@ public class UserHandler {
             return "{ \"message\": \"" + e.getMessage() + "\" }";
         } catch (UnauthorizedException e) {
             response.status(401);
+            return "{ \"message\": \"" + e.getMessage() + "\" }";
+        } catch (DataAccessException e) {
+            response.status(500);
             return "{ \"message\": \"" + e.getMessage() + "\" }";
         }
     }

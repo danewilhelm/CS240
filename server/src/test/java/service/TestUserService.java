@@ -1,93 +1,86 @@
 package service;
 
+import dataaccess.DataAccessException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import request.LoginRequest;
 import request.LogoutRequest;
-import request.RegisterRequest;
 import result.LoginResult;
 import result.RegisterResult;
 
 public class TestUserService {
-    static final String FELIX_THE_CAT = "FelixTheCat";
-    static final String FELIX_PASSWORD = "123456";
-    static final String FELIX_EMAIL = "rando@gmail.com";
 
-    public static RegisterResult exampleRegisterFelix() {
-        RegisterRequest request = new RegisterRequest(FELIX_THE_CAT, FELIX_PASSWORD, FELIX_EMAIL);
-        return UserService.register(request);
+    @AfterEach
+    public void clearAllData() throws DataAccessException{
+        FakeServer.CLEAR_SERVICE.clear();
     }
 
     @Test
-    public void goodRegister() {
-        RegisterResult actual = exampleRegisterFelix();
+    public void goodRegister() throws DataAccessException {
+        RegisterResult actual = FakeServer.exampleRegisterFelix();
         assert actual.authToken() != null;
-        assert actual.username().equals(FELIX_THE_CAT);
-        ClearService.clear();
+        assert actual.username().equals(FakeServer.FELIX_THE_CAT);
     }
 
     @Test
-    public void badRegisterWhenAlreadyRegistered() {
-        exampleRegisterFelix();
+    public void badRegisterWhenAlreadyRegistered() throws DataAccessException {
+        FakeServer.exampleRegisterFelix();
         try {
-            exampleRegisterFelix();
+            FakeServer.exampleRegisterFelix();
         } catch (AlreadyTakenException e) {
             // test passed
         }
-        ClearService.clear();
     }
 
     @Test
-    public void goodLogin() {
-        exampleRegisterFelix();
+    public void goodLogin() throws DataAccessException {
+        FakeServer.exampleRegisterFelix();
 
-        LoginRequest request = new LoginRequest(FELIX_THE_CAT, FELIX_PASSWORD);
-        LoginResult actual = UserService.login(request);
+        LoginRequest request = new LoginRequest(FakeServer.FELIX_THE_CAT, FakeServer.FELIX_PASSWORD);
+        LoginResult actual = FakeServer.USER_SERVICE.login(request);
 
         assert actual.authToken() != null;
-        assert actual.username().equals(FELIX_THE_CAT);
-        ClearService.clear();
+        assert actual.username().equals(FakeServer.FELIX_THE_CAT);
     }
 
     @Test
-    public void badLogin() {
-        exampleRegisterFelix();
+    public void badLogin() throws DataAccessException {
+        FakeServer.exampleRegisterFelix();
         try {
-            UserService.login(new LoginRequest(FELIX_THE_CAT, "wrong password"));
+            FakeServer.USER_SERVICE.login(new LoginRequest(FakeServer.FELIX_THE_CAT, "wrong password"));
         } catch (UnauthorizedException e) {
             // test passed
         }
 
         try {
-            UserService.login(new LoginRequest("wrong username", FELIX_PASSWORD));
+            FakeServer.USER_SERVICE.login(new LoginRequest("wrong username", FakeServer.FELIX_PASSWORD));
         } catch (UnauthorizedException e) {
             // test passed
         }
 
         try {
-            UserService.login(new LoginRequest("wrong username", "wrong password"));
+            FakeServer.USER_SERVICE.login(new LoginRequest("wrong username", "wrong password"));
         } catch (UnauthorizedException e) {
             // test passed
         }
     }
 
     @Test
-    public void goodLogout() {
-        String authToken = exampleRegisterFelix().authToken();
+    public void goodLogout() throws DataAccessException {
+        String authToken = FakeServer.exampleRegisterFelix().authToken();
         LogoutRequest request = new LogoutRequest(authToken);
-        UserService.logout(request);
-        ClearService.clear();
+        FakeServer.USER_SERVICE.logout(request);
     }
 
     @Test
-    public void badLogout() throws UnauthorizedException{
-        exampleRegisterFelix();
+    public void badLogout() throws UnauthorizedException, DataAccessException {
+        FakeServer.exampleRegisterFelix();
         LogoutRequest request = new LogoutRequest("bad auth");
         try {
-            UserService.logout(request);
+            FakeServer.USER_SERVICE.logout(request);
         } catch (UnauthorizedException e) {
             // test passed
         }
-        ClearService.clear();
     }
 
 

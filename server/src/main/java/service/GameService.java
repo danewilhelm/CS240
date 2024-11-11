@@ -1,7 +1,6 @@
 package service;
 
-import dataaccess.AuthMemoryDAO;
-import dataaccess.GameMemoryDAO;
+import dataaccess.*;
 import model.AuthData;
 import model.GameData;
 import request.CreateGameRequest;
@@ -20,31 +19,42 @@ public class GameService {
         Join Game
      */
 
-    public static CreateGameResult createGame(CreateGameRequest request) {
+    private AuthDAO authDAOInstance;
+    private GameDAO gameDAOInstance;
+    private UserDAO userDAOInstance;
+
+
+    public GameService(AuthDAO authDAOInstance, GameDAO gameDAOInstance, UserDAO userDAOInstance) {
+        this.authDAOInstance = authDAOInstance;
+        this.gameDAOInstance = gameDAOInstance;
+        this.userDAOInstance = userDAOInstance;
+    }
+
+    public CreateGameResult createGame(CreateGameRequest request) throws DataAccessException {
         if (request.gameName() == null) {
             throw new BadRequestException("Error: bad request");
         }
 
-        if (AuthMemoryDAO.INSTANCE.getAuth(request.authToken()) == null) {
+        if (authDAOInstance.getAuth(request.authToken()) == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
-        int gameID = GameMemoryDAO.INSTANCE.createGame(request.gameName());
+        int gameID = gameDAOInstance.createGame(request.gameName());
         return new CreateGameResult(gameID);
     }
 
-    public static JoinGameResult joinGame(JoinGameRequest request) {
+    public JoinGameResult joinGame(JoinGameRequest request) throws DataAccessException {
 
         if (request.playerColor() == null || !(request.playerColor().equals("WHITE") || request.playerColor().equals("BLACK"))) {
             throw new BadRequestException("Error: invalid teamColor given");
         }
 
-        AuthData auth = AuthMemoryDAO.INSTANCE.getAuth(request.authToken());
+        AuthData auth = authDAOInstance.getAuth(request.authToken());
         if (auth == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
-        GameData oldGame = GameMemoryDAO.INSTANCE.getGame(request.gameID());
+        GameData oldGame = gameDAOInstance.getGame(request.gameID());
         if (oldGame == null) {
             throw new BadRequestException("Error: game does not exist");
         }
@@ -63,17 +73,17 @@ public class GameService {
             }
             updatedGame = new GameData(oldGame.gameID(), oldGame.whiteUsername(), auth.username(), oldGame.gameName(), oldGame.game());
         }
-        GameMemoryDAO.INSTANCE.updateGame(updatedGame);
+        gameDAOInstance.updateGame(updatedGame);
 
         return new JoinGameResult();
     }
 
-    public static ListGamesResult listGames(ListGamesRequest request) {
-        if (AuthMemoryDAO.INSTANCE.getAuth(request.authToken()) == null) {
+    public ListGamesResult listGames(ListGamesRequest request) throws DataAccessException {
+        if (authDAOInstance.getAuth(request.authToken()) == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
-        return new ListGamesResult(GameMemoryDAO.INSTANCE.listGames());
+        return new ListGamesResult(gameDAOInstance.listGames());
     }
 
 

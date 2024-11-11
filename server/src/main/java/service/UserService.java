@@ -1,7 +1,6 @@
 package service;
 
-import dataaccess.AuthMemoryDAO;
-import dataaccess.UserMemoryDAO;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 import request.LoginRequest;
@@ -16,45 +15,55 @@ import java.util.UUID;
 
 public class UserService {
 //    Services the logic for 3 endpoints
-    public static RegisterResult register(RegisterRequest request) throws BadRequestException, AlreadyTakenException {
+    private AuthDAO authDAOInstance;
+    private GameDAO gameDAOInstance;
+    private UserDAO userDAOInstance;
+
+    public UserService(AuthDAO authDAOInstance, GameDAO gameDAOInstance, UserDAO userDAOInstance) {
+        this.authDAOInstance = authDAOInstance;
+        this.gameDAOInstance = gameDAOInstance;
+        this.userDAOInstance = userDAOInstance;
+    }
+
+    public RegisterResult register(RegisterRequest request) throws BadRequestException, AlreadyTakenException, DataAccessException {
         if (request.username() == null || request.email() == null || request.password() == null) {
             throw new BadRequestException("Error: bad request");
         }
 
-        if (UserMemoryDAO.INSTANCE.getUser(request.username()) != null) {
+        if (userDAOInstance.getUser(request.username()) != null) {
             throw new AlreadyTakenException("Error: already taken");
         }
 
         UserData user = new UserData(request.username(), request.password(), request.email());
-        UserMemoryDAO.INSTANCE.createUser(user);
+        userDAOInstance.createUser(user);
 
         String authToken = UUID.randomUUID().toString();
         AuthData auth = new AuthData(request.username(), authToken);
-        AuthMemoryDAO.INSTANCE.createAuth(auth);
+        authDAOInstance.createAuth(auth);
 
         return new RegisterResult(request.username(), authToken);
     }
 
-    public static LoginResult login(LoginRequest request) {
-        UserData attemptedUser = UserMemoryDAO.INSTANCE.getUser(request.username());
+    public LoginResult login(LoginRequest request) throws DataAccessException {
+        UserData attemptedUser = userDAOInstance.getUser(request.username());
         if (attemptedUser == null || ! attemptedUser.password().equals(request.password())) {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
         String authToken = UUID.randomUUID().toString();
         AuthData auth = new AuthData(request.username(), authToken);
-        AuthMemoryDAO.INSTANCE.createAuth(auth);
+        authDAOInstance.createAuth(auth);
 
         return new LoginResult(request.username(), authToken);
     }
 
-    public static LogoutResult logout(LogoutRequest request) {
-        if (AuthMemoryDAO.INSTANCE.getAuth(request.authToken()) == null) {
+    public LogoutResult logout(LogoutRequest request) throws DataAccessException {
+        if (authDAOInstance.getAuth(request.authToken()) == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
         try {
-            AuthMemoryDAO.INSTANCE.deleteAuth(request.authToken());
+            authDAOInstance.deleteAuth(request.authToken());
         } catch (dataaccess.DataAccessException e) {
             throw new RuntimeException(e);
         }

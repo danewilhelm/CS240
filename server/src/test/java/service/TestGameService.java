@@ -1,6 +1,8 @@
 package service;
 
+import dataaccess.DataAccessException;
 import model.GameData;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
@@ -16,119 +18,114 @@ public class TestGameService {
     private String felixAuthToken;
     private String loafAuthToken;
 
-    public void authLoaf() {
+    public void authLoaf() throws DataAccessException {
+
         RegisterRequest request = new RegisterRequest("Loaf", "meow", "whiteLoaf@cat.net");
-        loafAuthToken = UserService.register(request).authToken();
+        loafAuthToken = FakeServer.USER_SERVICE.register(request).authToken();
     }
 
-    public void authFelix() {
-        felixAuthToken = TestUserService.exampleRegisterFelix().authToken();
+    public void authFelix() throws DataAccessException {
+        felixAuthToken = FakeServer.exampleRegisterFelix().authToken();
     }
 
-    public CreateGameResult exampleAuthAndCreateCatGame() {
+    public CreateGameResult exampleAuthAndCreateCatGame() throws DataAccessException {
         authLoaf();
         authFelix();
         CreateGameRequest createGameRequest = new CreateGameRequest(felixAuthToken, catGameName);
-        return GameService.createGame(createGameRequest);
+        return FakeServer.GAME_SERVICE.createGame(createGameRequest);
     }
 
-    public void exampleCreateKittyGame() {
+    public void exampleCreateKittyGame() throws DataAccessException {
         CreateGameRequest createGameRequest = new CreateGameRequest(loafAuthToken, "Cat Pat");
-        GameService.createGame(createGameRequest);
+        FakeServer.GAME_SERVICE.createGame(createGameRequest);
     }
 
-
+    @AfterEach
+    public void clearAllData() throws DataAccessException{
+        FakeServer.CLEAR_SERVICE.clear();
+    }
 
     @Test
-    public void goodCreateGame() {
+    public void goodCreateGame() throws DataAccessException {
         CreateGameResult createGameResult = exampleAuthAndCreateCatGame();
         assert createGameResult.gameID() == catGameName.hashCode();
-        ClearService.clear();
     }
 
     @Test
-    public void goodCreateTwoGames() {
+    public void goodCreateTwoGames() throws DataAccessException {
         exampleAuthAndCreateCatGame();
         exampleCreateKittyGame();
-        ClearService.clear();
     }
 
     @Test
-    public void badCreateGame() {
+    public void badCreateGame() throws DataAccessException {
         try {
             CreateGameRequest createGameRequest = new CreateGameRequest(felixAuthToken, catGameName);
-            GameService.createGame(createGameRequest);
+            FakeServer.GAME_SERVICE.createGame(createGameRequest);
         } catch (UnauthorizedException e) {
             // test passed
         }
 
         try {
             CreateGameRequest createGameRequest = new CreateGameRequest(felixAuthToken, null);
-            GameService.createGame(createGameRequest);
+            FakeServer.GAME_SERVICE.createGame(createGameRequest);
         } catch (BadRequestException e) {
             // test passed
         }
-        ClearService.clear();
     }
 
     @Test
-    public void goodWhiteJoinGame() {
+    public void goodWhiteJoinGame() throws DataAccessException {
         CreateGameResult createGameResult = exampleAuthAndCreateCatGame();
         JoinGameRequest request = new JoinGameRequest(loafAuthToken, "WHITE", createGameResult.gameID());
-        ClearService.clear();
     }
 
     @Test
-    public void goodBlackJoinGame() {
+    public void goodBlackJoinGame() throws DataAccessException {
         CreateGameResult createGameResult = exampleAuthAndCreateCatGame();
         JoinGameRequest request = new JoinGameRequest(felixAuthToken, "BLACK", createGameResult.gameID());
-        ClearService.clear();
     }
 
     @Test
-    public void badDoubleWhiteJoin() {
+    public void badDoubleWhiteJoin() throws DataAccessException {
         goodWhiteJoinGame();
         try {
             goodWhiteJoinGame();
         } catch (AlreadyTakenException e) {
             // passed test
         }
-        ClearService.clear();
     }
 
     @Test
-    public void badDoubleBlackJoin() {
+    public void badDoubleBlackJoin() throws DataAccessException {
         goodBlackJoinGame();
         try {
             goodBlackJoinGame();
         } catch (AlreadyTakenException e) {
             // passed test
         }
-        ClearService.clear();
     }
 
     @Test
-    public void goodListGames() {
+    public void goodListGames() throws DataAccessException {
         exampleAuthAndCreateCatGame();
         ListGamesRequest request = new ListGamesRequest(loafAuthToken);
-        ListGamesResult result = GameService.listGames(request);
+        ListGamesResult result = FakeServer.GAME_SERVICE.listGames(request);
         assert result.games().size() == 1;
         for (GameData game : result.games()) {
             System.out.println(game);
         }
-        ClearService.clear();
     }
 
     @Test
-    public void badListGames() {
+    public void badListGames() throws DataAccessException {
         exampleAuthAndCreateCatGame();
         ListGamesRequest request = new ListGamesRequest("wrong auth");
         try {
-            ListGamesResult result = GameService.listGames(request);
+            ListGamesResult result = FakeServer.GAME_SERVICE.listGames(request);
         } catch (UnauthorizedException e) {
             // test passed
         }
-        ClearService.clear();
     }
 
 
