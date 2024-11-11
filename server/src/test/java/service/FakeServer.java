@@ -9,7 +9,7 @@ import result.RegisterResult;
 
 public class FakeServer {
 
-    public static final UserDAO USER_DAO = new UserMemoryDAO();
+    public static final UserDAO USER_DAO = new UserDatabaseDAO();
     public static final AuthDAO AUTH_DAO = new AuthMemoryDAO();
     public static final GameDAO GAME_DAO = new GameMemoryDAO();
 

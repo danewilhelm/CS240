@@ -5,11 +5,16 @@ import model.UserData;
 import java.sql.SQLException;
 
 public class UserDatabaseDAO implements UserDAO {
+
+    public UserDatabaseDAO () {
+
+    }
+
     @Override
     public void clear() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("TRUNCATE TABLE userTable")) {
-                var rs = preparedStatement.executeUpdate();
+                preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
             throw new DataAccessException("DataAccessException while clearing user table: " + e.getMessage());
@@ -23,7 +28,7 @@ public class UserDatabaseDAO implements UserDAO {
                 preparedStatement.setString(1, newUser.username());
                 preparedStatement.setString(2, newUser.password());
                 preparedStatement.setString(3, newUser.email());
-                var rs = preparedStatement.executeUpdate();
+                preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
             throw new DataAccessException("DataAccessException while creating user: " + e.getMessage());
