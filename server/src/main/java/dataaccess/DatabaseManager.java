@@ -1,6 +1,7 @@
 package dataaccess;
 
 import java.sql.*;
+import java.util.Arrays;
 import java.util.Properties;
 
 public class DatabaseManager {
@@ -33,7 +34,6 @@ public class DatabaseManager {
         }
 
         try {
-            createDatabase();
             configureDatabase();
         } catch (DataAccessException e) {
             throw new RuntimeException(e.getMessage());
@@ -78,19 +78,28 @@ public class DatabaseManager {
         }
     }
 
-    private static final String[] createStatements = {
-            """
+
+
+
+    private static void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+
+        try (var conn = DatabaseManager.getConnection()) {
+            final String[] createStatements = {
+                    """
             CREATE TABLE IF NOT EXISTS userTable (
                 `username` varchar(256) NOT NULL,
                 `password` varchar(256) NOT NULL,
                 `email` varchar(256) NOT NULL,
                 PRIMARY KEY (`username`)
-                )
+                )""",
+                    """
             CREATE TABLE IF NOT EXISTS authTable (
                 `username` varchar(256) NOT NULL,
                 `authToken` varchar(256) NOT NULL,
                 PRIMARY KEY (`username`)
-                )
+                )""",
+                    """
             CREATE TABLE IF NOT EXISTS gameTable (
                 `gameID` varchar(256) NOT NULL,
                 `whiteUsername` varchar(256) NOT NULL,
@@ -100,12 +109,8 @@ public class DatabaseManager {
                 PRIMARY KEY (`gameID`)
                 )
             """
-    };
-
-
-    private static void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
+            };
+            System.out.println(Arrays.toString(createStatements));
             for (var statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();

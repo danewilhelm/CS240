@@ -34,8 +34,8 @@ public class TestUserService {
 
     @Test
     public void goodLogin() throws DataAccessException {
-        FakeServer.exampleRegisterFelix();
-
+        RegisterResult registerResult = FakeServer.exampleRegisterFelix();
+        FakeServer.AUTH_DAO.deleteAuth(registerResult.authToken());
         LoginRequest request = new LoginRequest(FakeServer.FELIX_THE_CAT, FakeServer.FELIX_PASSWORD);
         LoginResult actual = FakeServer.USER_SERVICE.login(request);
 

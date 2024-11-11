@@ -34,10 +34,14 @@ public class AuthDatabaseDAO implements AuthDAO {
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("SELECT FROM authTable WHERE authToken=?")) {
+            try (var preparedStatement = conn.prepareStatement("SELECT username, authToken FROM authTable WHERE authToken=?")) {
                 preparedStatement.setString(1, authToken);
                 var rs = preparedStatement.executeQuery();
-                return new AuthData(rs.getString(1), rs.getString(2));
+                if (rs.next()) {
+                    return new AuthData(rs.getString(1), rs.getString(2));
+                } else {
+                    return null;
+                }
             }
         } catch (SQLException e) {
             throw new DataAccessException("DataAccessException while getting auth: " + e.getMessage());
@@ -53,7 +57,7 @@ public class AuthDatabaseDAO implements AuthDAO {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-                throw new DataAccessException("DataAccessException while getting auth: " + e.getMessage());
+                throw new DataAccessException("DataAccessException while deleting auth: " + e.getMessage());
             }
         }
 }

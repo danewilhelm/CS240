@@ -14,7 +14,7 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // create instances of DAOs
-        AuthDAO authDAOInstance = new AuthMemoryDAO();
+        AuthDAO authDAOInstance = new AuthDatabaseDAO();
         GameDAO gameDAOInstance = new GameMemoryDAO();
         UserDAO userDAOInstance = new UserDatabaseDAO();
 
