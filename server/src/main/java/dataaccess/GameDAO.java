@@ -16,7 +16,7 @@ public interface GameDAO {
         This is used when players join a game or when a move is made.
      */
 
-    public void clear();
+    public void clear() throws DataAccessException;
     public int createGame(String gameName) throws DataAccessException;
     public GameData getGame(int gameID) throws DataAccessException;
     public Collection<GameData> listGames() throws DataAccessException;

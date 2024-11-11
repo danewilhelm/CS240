@@ -11,7 +11,7 @@ public class FakeServer {
 
     public static final UserDAO USER_DAO = new UserDatabaseDAO();
     public static final AuthDAO AUTH_DAO = new AuthDatabaseDAO();
-    public static final GameDAO GAME_DAO = new GameMemoryDAO();
+    public static final GameDAO GAME_DAO = new GameDatabaseDAO();
 
     public static final UserService USER_SERVICE = new UserService(AUTH_DAO, GAME_DAO, USER_DAO);
     public static final GameService GAME_SERVICE = new GameService(AUTH_DAO, GAME_DAO, USER_DAO);

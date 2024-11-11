@@ -101,7 +101,7 @@ public class DatabaseManager {
                 )""",
                     """
             CREATE TABLE IF NOT EXISTS gameTable (
-                `gameID` varchar(256) NOT NULL,
+                `gameID` int NOT NULL AUTO_INCREMENT,
                 `whiteUsername` varchar(256) NOT NULL,
                 `blackUsername` varchar(256) NOT NULL,
                 `gameName` varchar(256) NOT NULL,
@@ -110,7 +110,6 @@ public class DatabaseManager {
                 )
             """
             };
-            System.out.println(Arrays.toString(createStatements));
             for (var statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();

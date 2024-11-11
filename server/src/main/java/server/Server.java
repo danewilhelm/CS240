@@ -15,7 +15,7 @@ public class Server {
 
         // create instances of DAOs
         AuthDAO authDAOInstance = new AuthDatabaseDAO();
-        GameDAO gameDAOInstance = new GameMemoryDAO();
+        GameDAO gameDAOInstance = new GameDatabaseDAO();
         UserDAO userDAOInstance = new UserDatabaseDAO();
 
         // create instances of Handlers
