@@ -48,7 +48,7 @@ public class TestGameService {
     @Test
     public void goodCreateGame() throws DataAccessException {
         CreateGameResult createGameResult = exampleAuthAndCreateCatGame();
-        assert createGameResult.gameID() == catGameName.hashCode();
+        assert createGameResult.gameID() != 0;
     }
 
     @Test

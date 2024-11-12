@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 public class GameDatabaseDAO implements GameDAO {
@@ -31,15 +32,14 @@ public class GameDatabaseDAO implements GameDAO {
         try (var conn = DatabaseManager.getConnection()) {
             String sqlStatement = "INSERT INTO gameTable (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
             try (var preparedStatement = conn.prepareStatement(sqlStatement, Statement.RETURN_GENERATED_KEYS)) {
-                preparedStatement.setString(1, "");
-                preparedStatement.setString(2, "");
+                preparedStatement.setString(1, null);
+                preparedStatement.setString(2, null);
                 preparedStatement.setString(3, gameName);
 
                 var jsonChessBoard = new Gson().toJson(new ChessGame());
                 preparedStatement.setString(4, jsonChessBoard);
 
                 preparedStatement.executeUpdate();
-
                 var resultSet = preparedStatement.getGeneratedKeys();
                 var ID = 0;
                 if (resultSet.next()) {
@@ -49,7 +49,8 @@ public class GameDatabaseDAO implements GameDAO {
                 return ID;
             }
         } catch (SQLException e) {
-            throw new DataAccessException("DataAccessException while creating game: " + e.getMessage());
+            e.printStackTrace();
+            throw new DataAccessException("DataAccessException while creating game: " + e);
         }
     }
 
@@ -106,7 +107,7 @@ public class GameDatabaseDAO implements GameDAO {
     @Override
     public void updateGame(GameData updatedGame) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            String sqlStatement = "UPDATE gameTable SET whiteUsername=?, blackUsername=?, gameName=? game=? WHERE gameID=?";
+            String sqlStatement = "UPDATE gameTable SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
             try (var preparedStatement = conn.prepareStatement(sqlStatement)) {
                 preparedStatement.setString(1, updatedGame.whiteUsername());
                 preparedStatement.setString(2, updatedGame.blackUsername());
@@ -120,7 +121,8 @@ public class GameDatabaseDAO implements GameDAO {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new DataAccessException("DataAccessException while creating auth: " + e.getMessage());
+//            throw new DataAccessException("DataAccessException while creating game: " + e.getMessage());
+            System.out.println("DataAccessException while updating game: " + e.getMessage());
         }
     }
 }

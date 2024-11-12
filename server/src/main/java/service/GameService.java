@@ -10,6 +10,8 @@ import result.CreateGameResult;
 import result.JoinGameResult;
 import result.ListGamesResult;
 
+import java.util.Objects;
+
 
 public class GameService {
     /*
@@ -34,9 +36,9 @@ public class GameService {
         if (request.gameName() == null) {
             throw new BadRequestException("Error: bad request");
         }
-
+        System.out.println(request.authToken());
         if (authDAOInstance.getAuth(request.authToken()) == null) {
-            throw new UnauthorizedException("Error: unauthorized");
+            throw new UnauthorizedException("Error: unauthorized create game");
         }
 
         int gameID = gameDAOInstance.createGame(request.gameName());
@@ -51,7 +53,7 @@ public class GameService {
 
         AuthData auth = authDAOInstance.getAuth(request.authToken());
         if (auth == null) {
-            throw new UnauthorizedException("Error: unauthorized");
+            throw new UnauthorizedException("Error: unauthorized join game");
         }
 
         GameData oldGame = gameDAOInstance.getGame(request.gameID());
@@ -64,12 +66,12 @@ public class GameService {
         GameData updatedGame;
         if (request.playerColor().equals("WHITE")) {
             if (oldGame.whiteUsername() != null) {
-                throw new AlreadyTakenException("Error: this team is already chosen");
+                throw new AlreadyTakenException("Error: white team is already chosen");
             }
             updatedGame = new GameData(oldGame.gameID(), auth.username(), oldGame.blackUsername(), oldGame.gameName(), oldGame.game());
         } else {
             if (oldGame.blackUsername() != null) {
-                throw new AlreadyTakenException("Error: this team is already chosen");
+                throw new AlreadyTakenException("Error: black team is already chosen");
             }
             updatedGame = new GameData(oldGame.gameID(), oldGame.whiteUsername(), auth.username(), oldGame.gameName(), oldGame.game());
         }
@@ -80,7 +82,7 @@ public class GameService {
 
     public ListGamesResult listGames(ListGamesRequest request) throws DataAccessException {
         if (authDAOInstance.getAuth(request.authToken()) == null) {
-            throw new UnauthorizedException("Error: unauthorized");
+            throw new UnauthorizedException("Error: unauthorized list games");
         }
 
         return new ListGamesResult(gameDAOInstance.listGames());

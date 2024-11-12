@@ -46,8 +46,10 @@ public class GameHandler {
 
     public Object handleCreateGame(Request request, Response response) {
         Gson serializer = new Gson();
-        String gameName = request.body();
-        CreateGameRequest createGameRequest = new CreateGameRequest(request.headers("authorization"), gameName);
+        record RequestBodyData(String gameName) {}
+        RequestBodyData bodyData = serializer.fromJson(request.body(), RequestBodyData.class);
+
+        CreateGameRequest createGameRequest = new CreateGameRequest(request.headers("authorization"), bodyData.gameName());
 
         try {
             CreateGameResult createGameResult = gameServiceInstance.createGame(createGameRequest);

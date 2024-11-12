@@ -3,6 +3,7 @@ package service;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
@@ -34,7 +35,10 @@ public class UserService {
             throw new AlreadyTakenException("Error: already taken");
         }
 
-        UserData user = new UserData(request.username(), request.password(), request.email());
+        String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+
+
+        UserData user = new UserData(request.username(), hashedPassword, request.email());
         userDAOInstance.createUser(user);
 
         String authToken = UUID.randomUUID().toString();
@@ -44,14 +48,26 @@ public class UserService {
         return new RegisterResult(request.username(), authToken);
     }
 
+
+
     public LoginResult login(LoginRequest request) throws DataAccessException {
         UserData attemptedUser = userDAOInstance.getUser(request.username());
-        if (attemptedUser == null || ! attemptedUser.password().equals(request.password())) {
-            throw new UnauthorizedException("Error: unauthorized");
+
+
+
+
+        if (attemptedUser == null || ! BCrypt.checkpw(request.password(), attemptedUser.password())) {
+            throw new UnauthorizedException("Error: unauthorized login");
         }
+//        String existingAuthToken = authDAOInstance.getExistingAuthToken(request.username());
+//        if (existingAuthToken != null) {
+//            return new LoginResult(request.username(), existingAuthToken);
+//        }
+
 
         String authToken = UUID.randomUUID().toString();
         AuthData auth = new AuthData(request.username(), authToken);
+
         authDAOInstance.createAuth(auth);
 
         return new LoginResult(request.username(), authToken);
@@ -59,7 +75,7 @@ public class UserService {
 
     public LogoutResult logout(LogoutRequest request) throws DataAccessException {
         if (authDAOInstance.getAuth(request.authToken()) == null) {
-            throw new UnauthorizedException("Error: unauthorized");
+            throw new UnauthorizedException("Error: unauthorized logout");
         }
 
         try {

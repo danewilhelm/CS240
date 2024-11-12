@@ -95,15 +95,16 @@ public class DatabaseManager {
                 )""",
                     """
             CREATE TABLE IF NOT EXISTS authTable (
+                `id` int NOT NULL AUTO_INCREMENT,
                 `username` varchar(256) NOT NULL,
                 `authToken` varchar(256) NOT NULL,
-                PRIMARY KEY (`username`)
+                PRIMARY KEY (`id`)
                 )""",
                     """
             CREATE TABLE IF NOT EXISTS gameTable (
                 `gameID` int NOT NULL AUTO_INCREMENT,
-                `whiteUsername` varchar(256) NOT NULL,
-                `blackUsername` varchar(256) NOT NULL,
+                `whiteUsername` varchar(256),
+                `blackUsername` varchar(256),
                 `gameName` varchar(256) NOT NULL,
                 `game` TEXT NOT NULL,
                 PRIMARY KEY (`gameID`)
