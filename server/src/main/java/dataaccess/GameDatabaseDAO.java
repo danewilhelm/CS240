@@ -19,14 +19,11 @@ public class GameDatabaseDAO implements GameDAO {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DataAccessException("DataAccessException while clearing game table: " + e.getMessage());
         }
     }
-    // var resultSet = preparedStatement.getGeneratedKeys();
-    //var ID = 0;
-    //if (resultSet.next()) {
-    //    ID = resultSet.getInt(1);
-    //}
+
     @Override
     public int createGame(String gameName) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
@@ -41,12 +38,12 @@ public class GameDatabaseDAO implements GameDAO {
 
                 preparedStatement.executeUpdate();
                 var resultSet = preparedStatement.getGeneratedKeys();
-                var ID = 0;
+                var id = 0;
                 if (resultSet.next()) {
-                    ID = resultSet.getInt(1);
+                    id = resultSet.getInt(1);
                 }
 
-                return ID;
+                return id;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -68,6 +65,7 @@ public class GameDatabaseDAO implements GameDAO {
                 }
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DataAccessException("DataAccessException while getting game: " + e.getMessage());
         }
     }
@@ -81,7 +79,8 @@ public class GameDatabaseDAO implements GameDAO {
                 return extractGamesList(rs);
             }
         } catch (SQLException e) {
-        throw new DataAccessException("DataAccessException while getting list of games: " + e.getMessage());
+            e.printStackTrace();
+            throw new DataAccessException("DataAccessException while getting list of games: " + e.getMessage());
         }
     }
 
@@ -121,7 +120,7 @@ public class GameDatabaseDAO implements GameDAO {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-//            throw new DataAccessException("DataAccessException while creating game: " + e.getMessage());
+            e.printStackTrace();
             System.out.println("DataAccessException while updating game: " + e.getMessage());
         }
     }

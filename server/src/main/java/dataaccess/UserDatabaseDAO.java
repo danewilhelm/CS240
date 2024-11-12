@@ -17,6 +17,7 @@ public class UserDatabaseDAO implements UserDAO {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DataAccessException("DataAccessException while clearing user table: " + e.getMessage());
         }
     }
@@ -31,6 +32,7 @@ public class UserDatabaseDAO implements UserDAO {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DataAccessException("DataAccessException while creating user: " + e.getMessage());
         }
     }
@@ -48,6 +50,7 @@ public class UserDatabaseDAO implements UserDAO {
                 }
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DataAccessException("DataAccessException while getting user: " + e.getMessage());
         }
     }

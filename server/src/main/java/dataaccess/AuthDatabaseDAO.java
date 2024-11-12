@@ -14,6 +14,7 @@ public class AuthDatabaseDAO implements AuthDAO {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DataAccessException("DataAccessException while clearing auth table: " + e.getMessage());
         }
     }
@@ -25,35 +26,13 @@ public class AuthDatabaseDAO implements AuthDAO {
                 preparedStatement.setString(1, authData.username());
                 preparedStatement.setString(2, authData.authToken());
 
-                System.out.println("DEBUG: " + authData);
-                System.out.println(Arrays.toString(Thread.currentThread().getStackTrace()));
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-//            e.printStackTrace();
+            e.printStackTrace();
             throw new DataAccessException("DataAccessException while creating auth: " + e.getMessage());
         }
     }
-
-//    @Override
-//    public String getExistingAuthToken(String username) throws DataAccessException {
-//        try (var conn = DatabaseManager.getConnection()) {
-//            try (var preparedStatement = conn.prepareStatement("SELECT authToken FROM authTable WHERE username=?")) {
-//                preparedStatement.setString(1, username);
-//
-//                var rs = preparedStatement.executeQuery();
-//                if (rs.next()) {
-//                    return rs.getString(1);
-//                } else {
-//                    return null;
-//                }
-//
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//            throw new DataAccessException("DataAccessException while creating auth: " + e.getMessage());
-//        }
-//    }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
@@ -68,6 +47,7 @@ public class AuthDatabaseDAO implements AuthDAO {
                 }
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DataAccessException("DataAccessException while getting auth: " + e.getMessage());
         }
     }
@@ -81,7 +61,8 @@ public class AuthDatabaseDAO implements AuthDAO {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-                throw new DataAccessException("DataAccessException while deleting auth: " + e.getMessage());
-            }
+            e.printStackTrace();
+            throw new DataAccessException("DataAccessException while deleting auth: " + e.getMessage());
         }
+    }
 }
