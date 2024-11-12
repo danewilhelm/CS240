@@ -53,17 +53,9 @@ public class UserService {
     public LoginResult login(LoginRequest request) throws DataAccessException {
         UserData attemptedUser = userDAOInstance.getUser(request.username());
 
-
-
-
         if (attemptedUser == null || ! BCrypt.checkpw(request.password(), attemptedUser.password())) {
             throw new UnauthorizedException("Error: unauthorized login");
         }
-//        String existingAuthToken = authDAOInstance.getExistingAuthToken(request.username());
-//        if (existingAuthToken != null) {
-//            return new LoginResult(request.username(), existingAuthToken);
-//        }
-
 
         String authToken = UUID.randomUUID().toString();
         AuthData auth = new AuthData(request.username(), authToken);

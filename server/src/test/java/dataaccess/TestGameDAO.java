@@ -9,7 +9,6 @@ import service.FakeServer;
 import java.util.Collection;
 
 public class TestGameDAO {
-//    private final GameData emptyGame = new GameData(1, null, null, ga)
 
     @AfterEach
     public void clearAllData() throws DataAccessException {
@@ -63,8 +62,8 @@ public class TestGameDAO {
 
     @Test
     public void goodUpdateGame() throws DataAccessException {
-        int GameID = FakeServer.GAME_DAO.createGame(FakeServer.GAME_NAME_ONE);
-        GameData oldGame = FakeServer.GAME_DAO.getGame(GameID);
+        int gameID = FakeServer.GAME_DAO.createGame(FakeServer.GAME_NAME_ONE);
+        GameData oldGame = FakeServer.GAME_DAO.getGame(gameID);
         GameData updatedGame = new GameData(oldGame.gameID(), FakeServer.FELIX_THE_CAT, oldGame.blackUsername(), oldGame.gameName(), oldGame.game());
         FakeServer.GAME_DAO.updateGame(updatedGame);
     }

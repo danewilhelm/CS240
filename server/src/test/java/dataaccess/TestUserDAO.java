@@ -7,7 +7,7 @@ import service.FakeServer;
 
 public class TestUserDAO {
 
-    private final UserData FELIX_USER = FakeServer.generateFelixUserData();
+    private static final UserData FELIX_USER = FakeServer.generateFelixUserData();
 
     @AfterEach
     public void clearAllData() throws DataAccessException {

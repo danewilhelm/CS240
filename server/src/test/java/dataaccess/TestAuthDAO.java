@@ -7,7 +7,7 @@ import service.FakeServer;
 
 public class TestAuthDAO {
 
-    private final AuthData FELIX_AUTH = FakeServer.generateFelixAuth();
+    private static final AuthData FELIX_AUTH = FakeServer.generateFelixAuth();
 
 
     @AfterEach
