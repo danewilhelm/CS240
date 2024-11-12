@@ -19,13 +19,13 @@ public class AuthMemoryDAO implements AuthDAO {
         authDataMap.put(authData.authToken(), authData);
     }
 
-    @Override
-    public String getExistingAuthToken(String username) throws DataAccessException {
-        final var maybeAuthToken = authDataMap.entrySet().stream()
-                .filter(stringAuthDataEntry -> stringAuthDataEntry.getValue().username().equals(username))
-                .map(Map.Entry::getKey).findFirst();
-        return maybeAuthToken.orElse(null);
-    }
+//    @Override
+//    public String getExistingAuthToken(String username) throws DataAccessException {
+//        final var maybeAuthToken = authDataMap.entrySet().stream()
+//                .filter(stringAuthDataEntry -> stringAuthDataEntry.getValue().username().equals(username))
+//                .map(Map.Entry::getKey).findFirst();
+//        return maybeAuthToken.orElse(null);
+//    }
 
     @Override
     public AuthData getAuth(String authToken) {

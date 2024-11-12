@@ -41,7 +41,7 @@ public class TestGameService {
     }
 
     @AfterEach
-    public void clearAllData() throws DataAccessException{
+    public void clearAllData() throws DataAccessException {
         FakeServer.CLEAR_SERVICE.clear();
     }
 

@@ -17,14 +17,17 @@ public class FakeServer {
     public static final GameService GAME_SERVICE = new GameService(AUTH_DAO, GAME_DAO, USER_DAO);
     public static final ClearService CLEAR_SERVICE = new ClearService(AUTH_DAO, GAME_DAO, USER_DAO);
 
-    static final String FELIX_THE_CAT = "FelixTheCat";
-    static final String FELIX_PASSWORD = "123456";
-    static final String FELIX_EMAIL = "rando@gmail.com";
+    public static final String FELIX_THE_CAT = "FelixTheCat";
+    public static final String FELIX_PASSWORD = "123456";
+    public static final String FELIX_EMAIL = "rando@gmail.com";
+
+    public static final String GAME_NAME_ONE = "1st chess match ever";
+    public static final String GAME_NAME_TWO = "2nd chess match ever";
 
     public static void createFakeData() throws DataAccessException {
             USER_DAO.createUser(generateFelixUserData());
-            GAME_DAO.createGame("1st chess match ever");
-            GAME_DAO.createGame("2nd chess match ever");
+            GAME_DAO.createGame(GAME_NAME_ONE);
+            GAME_DAO.createGame(GAME_NAME_TWO);
             AUTH_DAO.createAuth(generateFelixAuth());
 
     }

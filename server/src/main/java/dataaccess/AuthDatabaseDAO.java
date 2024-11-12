@@ -30,30 +30,30 @@ public class AuthDatabaseDAO implements AuthDAO {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             throw new DataAccessException("DataAccessException while creating auth: " + e.getMessage());
         }
     }
 
-    @Override
-    public String getExistingAuthToken(String username) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("SELECT authToken FROM authTable WHERE username=?")) {
-                preparedStatement.setString(1, username);
-
-                var rs = preparedStatement.executeQuery();
-                if (rs.next()) {
-                    return rs.getString(1);
-                } else {
-                    return null;
-                }
-
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DataAccessException("DataAccessException while creating auth: " + e.getMessage());
-        }
-    }
+//    @Override
+//    public String getExistingAuthToken(String username) throws DataAccessException {
+//        try (var conn = DatabaseManager.getConnection()) {
+//            try (var preparedStatement = conn.prepareStatement("SELECT authToken FROM authTable WHERE username=?")) {
+//                preparedStatement.setString(1, username);
+//
+//                var rs = preparedStatement.executeQuery();
+//                if (rs.next()) {
+//                    return rs.getString(1);
+//                } else {
+//                    return null;
+//                }
+//
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            throw new DataAccessException("DataAccessException while creating auth: " + e.getMessage());
+//        }
+//    }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
