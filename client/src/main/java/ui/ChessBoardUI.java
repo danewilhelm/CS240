@@ -46,6 +46,10 @@ public class ChessBoardUI {
     
     
     public static void main(String[] args) {
+        observe();
+    }
+
+    public static void observe() {
         ChessGame game = new ChessGame();
         game.getBoard().resetBoard();
 
@@ -55,9 +59,10 @@ public class ChessBoardUI {
         whitePlayerPrinter.drawChessBoardUI();
     }
 
+
     // ---------------------------------- Creating the entire board---------------------------------
 
-    public void drawChessBoardUI() {
+    private void drawChessBoardUI() {
         printNewLine();
         drawColumnHeader();
         drawMiddleRows();
@@ -65,7 +70,7 @@ public class ChessBoardUI {
         printNewLine();
     }
 
-    public void drawMiddleRows() {
+    private void drawMiddleRows() {
         for (int i = 0; i < 4; i++) {
             drawMiddleRow(true);
             drawMiddleRow(false);
@@ -73,7 +78,7 @@ public class ChessBoardUI {
     }
 
     // ---------------------------------- Drawing Single Rows-----------------------------------
-    public void drawMiddleRow(boolean startWithWhite) {
+    private void drawMiddleRow(boolean startWithWhite) {
         drawSideHeader();
         for (int i = 0; i < 4; i++) {
             if (startWithWhite) {
@@ -89,7 +94,7 @@ public class ChessBoardUI {
         incrementSideHeader();
     }
 
-    public void drawSideHeader() {
+    private void drawSideHeader() {
         setHeaderColoring();
         out.print(" " + sideHeader.charAt(sideHeaderIndex) + " ");
     }
@@ -97,31 +102,32 @@ public class ChessBoardUI {
 
 
     // ------------------------------------- Drawing Headers --------------------------------------------
-    public void drawColumnHeader() {
+    private void drawColumnHeader() {
         setHeaderColoring();
         out.print(isWhitePerspective ? whiteColumnHeader : blackColumnHeader);
         printNewLine();
     }
 
     private void printNewLine() {
-        out.print(SET_BG_COLOR_DARK_GREY);
+        out.print(RESET_TEXT_COLOR);
+        out.print(RESET_BG_COLOR);
         out.println();
     }
 
-    public void setHeaderColoring() {
+    private void setHeaderColoring() {
         out.print(SET_BG_COLOR_LIGHT_GREY);
         out.print(SET_TEXT_COLOR_BLACK);
     }
 
     // ------------------------------------- ChessBoard Drawing Helper Methods -----------------------------------------
-    public void drawBlackSquare() {
+    private void drawBlackSquare() {
         out.print(SET_BG_COLOR_BLACK);
         out.print(" ");
         drawChessPiece();
         out.print(" ");
     }
 
-    public void drawWhiteSquare() {
+    private void drawWhiteSquare() {
         out.print(SET_BG_COLOR_WHITE);
         out.print(" ");
         drawChessPiece();
