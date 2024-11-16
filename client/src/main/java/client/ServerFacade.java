@@ -4,8 +4,8 @@ public class ServerFacade {
 
     ClientCommunicator http;
 
-    public ServerFacade() {
-        http = new ClientCommunicator(this, "localhost:8080");
+    public ServerFacade(String serverURL) {
+        http = new ClientCommunicator(this, serverURL);
     }
 
     public boolean register(String username, String password, String email) {

@@ -18,8 +18,8 @@ public class ClientCommunicator {
     ServerFacade serverFacade;
     String authToken;
 
-    public ClientCommunicator(ServerFacade serverFacade, String port) {
-        serverUrl = "http://" + port;
+    public ClientCommunicator(ServerFacade serverFacade, String serverURL) {
+        this.serverUrl = serverURL;
         this.serverFacade = serverFacade;
     }
 

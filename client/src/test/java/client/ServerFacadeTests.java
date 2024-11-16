@@ -7,13 +7,20 @@ import server.Server;
 public class ServerFacadeTests {
 
     private static Server server;
-    ServerFacade facade = new ServerFacade();
-
+    private ServerFacade facade;
+    private static int port;
     @BeforeAll
     public static void init() {
         server = new Server();
-        var port = server.run(8080);
+        port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
+    }
+
+
+    @BeforeEach
+    void clear() {
+        facade = new ServerFacade("http://localhost:" + port);
+        facade.http.clear();
     }
 
     @AfterAll
@@ -21,11 +28,6 @@ public class ServerFacadeTests {
         server.stop();
     }
 
-    @AfterEach
-    void clear() {
-        facade.http.clear();
-        facade = new ServerFacade();
-    }
 
 
     @Test

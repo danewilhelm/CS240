@@ -8,7 +8,7 @@ public class ClientUI {
 
     private boolean isRunning = true;
     private boolean isLoggedIn = false;
-    private ServerFacade serverFacade = new ServerFacade();
+    private ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
 
 
     public static void main(String[] args) throws Exception {
