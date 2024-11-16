@@ -115,7 +115,7 @@ public class ClientCommunicator {
     public boolean joinGame(String teamColor, int gameID) {
         var body = Map.of(
                 "gameID", gameID,
-                "playerColor", teamColor);
+                "playerColor", teamColor.toUpperCase());
 
         String json = new Gson().toJson(body);
         try {

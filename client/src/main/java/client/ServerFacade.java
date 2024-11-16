@@ -8,7 +8,6 @@ public class ServerFacade {
         http = new ClientCommunicator(this, "localhost:8080");
     }
 
-
     public boolean register(String username, String password, String email) {
         return http.register(username, password, email);
     }
