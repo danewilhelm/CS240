@@ -1,14 +1,17 @@
 package ui;
 
+import client.ServerFacade;
+
 import java.util.Scanner;
 
-public class Client {
+public class ClientUI {
 
     private boolean isRunning = true;
+    private ServerFacade serverFacade = new ServerFacade();
 
 
     public static void main(String[] args) throws Exception {
-        new Client().run();
+        new ClientUI().run();
     }
 
     private String[] getInput(String userStatus) {
@@ -67,7 +70,7 @@ public class Client {
                     ChessBoardUI.observe();
                     break;
                 case "logout":
-                    attemptLogout(input);
+                    attemptLogout();
                     break;
                 case "quit":
                     System.out.println("Goodbye :(");
@@ -77,8 +80,56 @@ public class Client {
         }
     }
 
+    // ------------------------------------- Pre-Login Helper Methods--------------------------------------------------
+    private void attemptRegister(String[] input) {
+        if (input.length != 4) {
+            System.out.println("oi bruv, you need to give a username, password, and email. Nothin' more, nothin' less");
+            return;
+        }
+
+        if (serverFacade.register(input[1], input[2], input[3])) {
+            System.out.println("Successfully registered");
+            postLoginLoop();
+        } else {
+            System.out.println("Failed to register. Try again");
+        }
+
+        // attempt to register
+
+    }
+
+    private void attemptLogin(String[] input) {
+        if (input.length != 3) {
+            System.out.println("oi bruv, you need to give a username and password. Nothin' else");
+            return;
+        }
+
+        if (serverFacade.login(input[1], input[2])) {
+            System.out.println("Successfully logged in");
+            postLoginLoop();
+        } else {
+            System.out.println("Failed to log in. Try again");
+        }
+
+    }
+
+    private void printLoggedOutHelp() {
+        System.out.println("register <USERNAME> <PASSWORD> <EMAIL> - to create an account");
+        System.out.println("login <USERNAME> <PASSWORD> - to login into your account");
+        System.out.println("quit - exit the program");
+        System.out.println("help - oi bruv, you lookin' at it");
+    }
+
+
+
     // ---------------------------- Post-Login Helper Methods --------------------------------------------------------
     private void attemptListGames() {
+        if (serverFacade.listGames()) {
+            System.out.println("Successfully listed games");
+            postLoginLoop();
+        } else {
+            System.out.println("Failed to list games. Try again");
+        }
     }
 
     private void attemptJoinGame(String[] input) {
@@ -90,12 +141,24 @@ public class Client {
         String joinColor = input[2].toUpperCase();
         if (! (joinColor.equals("WHITE") || joinColor.equals("BLACK"))) {
             System.out.println("incorrect input: the team color must be WHITE or BLACK");
-
         }
+
+        if (serverFacade.joinGame(input[1], input[2])) {
+            System.out.println("Successfully joined game");
+            postLoginLoop();
+        } else {
+            System.out.println("Failed to join game. Try again");
+        }
+
     }
 
-    private void attemptLogout(String[] input) {
-
+    private void attemptLogout() {
+        if (serverFacade.logout()) {
+            System.out.println("Successfully logged out");
+            postLoginLoop();
+        } else {
+            System.out.println("Failed to log out. Try again");
+        }
     }
 
     private void printLoggedInHelp() {
@@ -111,35 +174,7 @@ public class Client {
 
 
 
-    // ------------------------------------- Pre-Login Helper Methods--------------------------------------------------
-    private void attemptRegister(String[] input) {
-        if (input.length != 4) {
-            System.out.println("oi bruv, you need to give a username, password, and email. Nothin' more, nothin' less");
-            return;
-        }
 
-        // attempt to register
-        postLoginLoop();
-
-    }
-
-    private void attemptLogin(String[] input) {
-        if (input.length != 3) {
-            System.out.println("oi bruv, you need to give a username and password. Nothin' else");
-            return;
-        }
-
-        // attempt to login
-        postLoginLoop();
-
-    }
-
-    private void printLoggedOutHelp() {
-        System.out.println("register <USERNAME> <PASSWORD> <EMAIL> - to create an account");
-        System.out.println("login <USERNAME> <PASSWORD> - to login into your account");
-        System.out.println("quit - exit the program");
-        System.out.println("help - oi bruv, you lookin' at it");
-    }
 
 
 
