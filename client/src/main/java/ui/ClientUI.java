@@ -7,6 +7,7 @@ import java.util.Scanner;
 public class ClientUI {
 
     private boolean isRunning = true;
+    private boolean isLoggedIn = false;
     private ServerFacade serverFacade = new ServerFacade();
 
 
@@ -53,10 +54,13 @@ public class ClientUI {
 
 
     private void postLoginLoop() {
-        while (isRunning) {
+        while (isRunning && isLoggedIn) {
             String[] input = getInput("LOGGED_IN");
             String command = input[0].toLowerCase();
             switch (command) {
+                case "create":
+                    attemptCreateGame(input);
+                    break;
                 case "help":
                     printLoggedInHelp();
                     break;
@@ -76,8 +80,24 @@ public class ClientUI {
                     System.out.println("Goodbye :(");
                     isRunning = false;
                     return;
+                default:
+                    System.out.println("oi bruv, I don't understand what you want");
             }
         }
+    }
+
+    private void attemptCreateGame(String[] input) {
+        if (input.length != 2) {
+            System.out.println("Missing input: create <NAME> - create a game");
+            return;
+        }
+
+        if (serverFacade.createGame(input[1])) {
+            System.out.println("Successfully created game");
+        } else {
+            System.out.println("Failed to register. Try again");
+        }
+
     }
 
     // ------------------------------------- Pre-Login Helper Methods--------------------------------------------------
@@ -89,13 +109,11 @@ public class ClientUI {
 
         if (serverFacade.register(input[1], input[2], input[3])) {
             System.out.println("Successfully registered");
+            isLoggedIn = true;
             postLoginLoop();
         } else {
             System.out.println("Failed to register. Try again");
         }
-
-        // attempt to register
-
     }
 
     private void attemptLogin(String[] input) {
@@ -106,6 +124,7 @@ public class ClientUI {
 
         if (serverFacade.login(input[1], input[2])) {
             System.out.println("Successfully logged in");
+            isLoggedIn = true;
             postLoginLoop();
         } else {
             System.out.println("Failed to log in. Try again");
@@ -143,7 +162,8 @@ public class ClientUI {
             System.out.println("incorrect input: the team color must be WHITE or BLACK");
         }
 
-        if (serverFacade.joinGame(input[1], input[2])) {
+
+        if (serverFacade.joinGame(input[2], Integer.parseInt(input[1]))) {
             System.out.println("Successfully joined game");
             postLoginLoop();
         } else {
@@ -155,7 +175,7 @@ public class ClientUI {
     private void attemptLogout() {
         if (serverFacade.logout()) {
             System.out.println("Successfully logged out");
-            postLoginLoop();
+            isLoggedIn = false;
         } else {
             System.out.println("Failed to log out. Try again");
         }

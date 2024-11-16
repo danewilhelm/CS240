@@ -17,8 +17,8 @@ public class ServerFacade {
         return http.login(username, password);
     }
 
-    public boolean joinGame(String gameID, String teamColor) {
-        return http.joinGame(gameID, teamColor);
+    public boolean joinGame(String teamColor, int gameID) {
+        return http.joinGame(teamColor, gameID);
     }
 
     public boolean logout() {
@@ -27,5 +27,9 @@ public class ServerFacade {
 
     public boolean listGames() {
         return http.listGames();
+    }
+
+    public boolean createGame(String gameName) {
+        return http.createGame(gameName);
     }
 }
