@@ -3,6 +3,7 @@ package service;
 import dataaccess.DataAccessException;
 import model.GameData;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
@@ -59,19 +60,11 @@ public class TestGameService {
 
     @Test
     public void badCreateGame() throws DataAccessException {
-        try {
-            CreateGameRequest createGameRequest = new CreateGameRequest(felixAuthToken, catGameName);
-            FakeServer.GAME_SERVICE.createGame(createGameRequest);
-        } catch (UnauthorizedException e) {
-            // test passed
-        }
+        CreateGameRequest createGameRequest = new CreateGameRequest(felixAuthToken, catGameName);
+        Assertions.assertThrows(UnauthorizedException.class, () -> FakeServer.GAME_SERVICE.createGame(createGameRequest));
 
-        try {
-            CreateGameRequest createGameRequest = new CreateGameRequest(felixAuthToken, null);
-            FakeServer.GAME_SERVICE.createGame(createGameRequest);
-        } catch (BadRequestException e) {
-            // test passed
-        }
+        CreateGameRequest createGameRequest2 = new CreateGameRequest(felixAuthToken, null);
+        Assertions.assertThrows(BadRequestException.class, () -> FakeServer.GAME_SERVICE.createGame(createGameRequest2));
     }
 
     @Test
