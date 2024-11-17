@@ -98,12 +98,29 @@ public class ClientUI {
             return;
         }
 
-        if (! input[1].matches("\\d")) {
+        if (! input[1].matches("\\d+")) {
             System.out.println("Incorrect input: ID must be a number");
             System.out.println("Find the correct ID by searching the games list");
             return;
         }
+
+        int givenGameID = Integer.parseInt(input[1]);
+
+
         Collection<GameData> gamesList = serverFacade.listGames();
+        GameData observedGame = null;
+        for (GameData curGame: gamesList) {
+            if (curGame.gameID() == givenGameID) {
+                observedGame = curGame;
+            }
+        }
+
+        if (observedGame == null) {
+            System.out.println("Incorrect input: There is no game associated with this ID");
+        } else {
+            ChessBoardUI.observe();
+        }
+
     }
 
     private void attemptListGames() {
@@ -117,10 +134,10 @@ public class ClientUI {
             System.out.println("There are no games created");
         } else {
             int indexGameID = 1;
-            for (GameData game: gamesList) {
-                System.out.println(indexGameID + ". " + game.gameName());
-                System.out.println("    whitePlayer: " + game.whiteUsername());
-                System.out.println("    blackPlayer: " + game.blackUsername());
+            for (GameData curGame: gamesList) {
+                System.out.println(indexGameID + ". " + curGame.gameName());
+                System.out.println("    whitePlayer: " + curGame.whiteUsername());
+                System.out.println("    blackPlayer: " + curGame.blackUsername());
                 indexGameID++;
             }
         }
@@ -132,7 +149,7 @@ public class ClientUI {
             return;
         }
 
-        if (! input[1].matches("\\d")) {
+        if (! input[1].matches("\\d+")) {
             System.out.println("Incorrect input: ID must be a number");
             System.out.println("Find the correct ID by searching the games list");
             return;
