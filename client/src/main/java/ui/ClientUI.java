@@ -1,7 +1,9 @@
 package ui;
 
 import client.ServerFacade;
+import model.GameData;
 
+import java.util.Collection;
 import java.util.Scanner;
 
 public class ClientUI {
@@ -71,7 +73,7 @@ public class ClientUI {
                     attemptJoinGame(input);
                     break;
                 case "observe":
-                    ChessBoardUI.observe();
+                    attemptObserveGame(input);
                     break;
                 case "logout":
                     attemptLogout();
@@ -86,68 +88,37 @@ public class ClientUI {
         }
     }
 
-    private void attemptCreateGame(String[] input) {
-        if (input.length != 2) {
-            System.out.println("Missing input: create <NAME> - create a game");
-            return;
-        }
-
-        if (serverFacade.createGame(input[1])) {
-            System.out.println("Successfully created game");
-        } else {
-            System.out.println("Failed to register. Try again");
-        }
-
-    }
-
-    // ------------------------------------- Pre-Login Helper Methods--------------------------------------------------
-    private void attemptRegister(String[] input) {
-        if (input.length != 4) {
-            System.out.println("oi bruv, you need to give a username, password, and email. Nothin' more, nothin' less");
-            return;
-        }
-
-        if (serverFacade.register(input[1], input[2], input[3])) {
-            System.out.println("Successfully registered");
-            isLoggedIn = true;
-            postLoginLoop();
-        } else {
-            System.out.println("Failed to register. Try again");
-        }
-    }
-
-    private void attemptLogin(String[] input) {
-        if (input.length != 3) {
-            System.out.println("oi bruv, you need to give a username and password. Nothin' else");
-            return;
-        }
-
-        if (serverFacade.login(input[1], input[2])) {
-            System.out.println("Successfully logged in");
-            isLoggedIn = true;
-            postLoginLoop();
-        } else {
-            System.out.println("Failed to log in. Try again");
-        }
-
-    }
-
-    private void printLoggedOutHelp() {
-        System.out.println("register <USERNAME> <PASSWORD> <EMAIL> - to create an account");
-        System.out.println("login <USERNAME> <PASSWORD> - to login into your account");
-        System.out.println("quit - exit the program");
-        System.out.println("help - oi bruv, you lookin' at it");
-    }
-
-
-
     // ---------------------------- Post-Login Helper Methods --------------------------------------------------------
+    private void attemptObserveGame(String[] input) {
+        if (input.length != 2) {
+            System.out.println("Missing input: observe <ID>");
+            return;
+        }
+
+        if (input[1].matches("\\d")) {
+            System.out.println("Incorrect input: ID must be a number");
+            return;
+        }
+
+        Collection<GameData> gamesList = serverFacade.listGames();
+    }
+
     private void attemptListGames() {
-        if (serverFacade.listGames()) {
-            System.out.println("Successfully listed games");
-            postLoginLoop();
-        } else {
+        Collection<GameData> gamesList = serverFacade.listGames();
+        if (gamesList == null) {
             System.out.println("Failed to list games. Try again");
+            return;
+        }
+
+        if (gamesList.isEmpty()) {
+            System.out.println("There are no games created");
+        } else {
+            int indexGameID = 1;
+            for (GameData game: gamesList) {
+                System.out.println(indexGameID + ". " + game.gameName());
+                System.out.println("    whitePlayer: " + game.whiteUsername());
+                System.out.println("    blackPlayer: " + game.blackUsername());
+            }
         }
     }
 
@@ -193,10 +164,57 @@ public class ClientUI {
 
 
 
+    private void attemptCreateGame(String[] input) {
+        if (input.length != 2) {
+            System.out.println("Missing input: create <NAME> - create a game");
+            return;
+        }
 
+        if (serverFacade.createGame(input[1])) {
+            System.out.println("Successfully created game");
+        } else {
+            System.out.println("Failed to register. Try again");
+        }
+    }
 
+    // ------------------------------------- Pre-Login Helper Methods--------------------------------------------------
+    private void attemptRegister(String[] input) {
+        if (input.length != 4) {
+            System.out.println("oi bruv, you need to give a username, password, and email. Nothin' more, nothin' less");
+            return;
+        }
 
+        if (serverFacade.register(input[1], input[2], input[3])) {
+            System.out.println("Successfully registered");
+            isLoggedIn = true;
+            postLoginLoop();
+        } else {
+            System.out.println("Failed to register. Try again");
+        }
+    }
 
+    private void attemptLogin(String[] input) {
+        if (input.length != 3) {
+            System.out.println("oi bruv, you need to give a username and password. Nothin' else");
+            return;
+        }
+
+        if (serverFacade.login(input[1], input[2])) {
+            System.out.println("Successfully logged in");
+            isLoggedIn = true;
+            postLoginLoop();
+        } else {
+            System.out.println("Failed to log in. Try again");
+        }
+
+    }
+
+    private void printLoggedOutHelp() {
+        System.out.println("register <USERNAME> <PASSWORD> <EMAIL> - to create an account");
+        System.out.println("login <USERNAME> <PASSWORD> - to login into your account");
+        System.out.println("quit - exit the program");
+        System.out.println("help - oi bruv, you lookin' at it");
+    }
 
 
 

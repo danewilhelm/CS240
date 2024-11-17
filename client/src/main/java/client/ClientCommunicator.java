@@ -10,6 +10,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Map;
 
 public class ClientCommunicator {
@@ -17,6 +18,7 @@ public class ClientCommunicator {
     String serverUrl;
     ServerFacade serverFacade;
     String authToken;
+    Collection<GameData> gamesListCache;
 
     public ClientCommunicator(ServerFacade serverFacade, String serverURL) {
         this.serverUrl = serverURL;
@@ -135,19 +137,13 @@ public class ClientCommunicator {
         }
     }
 
-    public boolean listGames() {
+    public Collection<GameData> listGames() {
         try {
-            var result = makeRequest("GET","/game", null, ListGamesResult.class);
-            int index = 1;
-            for (GameData game: result.games()) {
-                System.out.println(index + ". " + game.gameName());
-                System.out.println("    whitePlayer: " + game.whiteUsername());
-                System.out.println("    blackPlayer: " + game.blackUsername());
-            }
-            return true;
+            ListGamesResult result = makeRequest("GET","/game", null, ListGamesResult.class);
+            return result.games();
         } catch (ResponseException e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 
@@ -170,5 +166,9 @@ public class ClientCommunicator {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public Collection<GameData> getGamesList() {
+        return gamesListCache;
     }
 }

@@ -7,7 +7,7 @@ import server.Server;
 public class ServerFacadeTests {
 
     private static Server server;
-    private ServerFacade facade;
+    private static ServerFacade facade;
     private static int port;
     @BeforeAll
     public static void init() {
@@ -25,6 +25,7 @@ public class ServerFacadeTests {
 
     @AfterAll
     static void stopServer() {
+        facade.http.clear();
         server.stop();
     }
 
@@ -127,18 +128,19 @@ public class ServerFacadeTests {
     @Test
     public void goodListGames() {
         facade.register("123135", "12414", "123");
-        Assertions.assertTrue(facade.listGames());
+        facade.createGame("BEST GAME EVER");
+        Assertions.assertNotNull(facade.listGames());
     }
 
     @Test
     public void badListGames() {
-        Assertions.assertFalse(facade.listGames());
+        Assertions.assertNull(facade.listGames());
     }
 
     @Test
     public void badListGames2() {
         facade.register("123135", "12414", "123");
         facade.logout();
-        Assertions.assertFalse(facade.listGames());
+        Assertions.assertNull(facade.listGames());
     }
 }

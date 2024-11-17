@@ -1,5 +1,9 @@
 package client;
 
+import model.GameData;
+
+import java.util.Collection;
+
 public class ServerFacade {
 
     ClientCommunicator http;
@@ -24,7 +28,7 @@ public class ServerFacade {
         return http.logout();
     }
 
-    public boolean listGames() {
+    public Collection<GameData> listGames() {
         return http.listGames();
     }
 
