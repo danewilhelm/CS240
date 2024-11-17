@@ -34,7 +34,6 @@ public class UserHandler {
     public Object handleRegister(Request request, Response response) {
         Gson serializer = new Gson();
         RegisterRequest registerRequest = serializer.fromJson(request.body(), RegisterRequest.class);
-        System.out.println(registerRequest);
         try {
             RegisterResult registerResult = userServiceInstance.register(registerRequest);
             response.status(200);

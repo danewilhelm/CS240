@@ -87,7 +87,6 @@ public class ClientCommunicator {
         try {
             RegisterResult result = makeRequest("POST", "/user", body, RegisterResult.class);
             authToken = result.authToken();
-            System.out.println(result);
             return true;
         } catch (ResponseException e) {
             e.printStackTrace();
@@ -104,7 +103,6 @@ public class ClientCommunicator {
         try {
             LoginResult result = makeRequest("POST","/session", body, LoginResult.class);
             authToken = result.authToken();
-            System.out.println(result);
             return true;
         } catch (ResponseException e) {
             e.printStackTrace();
@@ -112,10 +110,10 @@ public class ClientCommunicator {
         }
     }
 
-    public boolean joinGame(String teamColor, int gameID) {
+    public boolean joinGame(String playerColor, int gameID) {
         var body = Map.of(
                 "gameID", gameID,
-                "playerColor", teamColor.toUpperCase());
+                "playerColor", playerColor.toUpperCase());
 
         String json = new Gson().toJson(body);
         try {
@@ -142,7 +140,9 @@ public class ClientCommunicator {
             var result = makeRequest("GET","/game", null, ListGamesResult.class);
             int index = 1;
             for (GameData game: result.games()) {
-                System.out.println(index + ". " + game.gameName() + game.whiteUsername() + game.whiteUsername());
+                System.out.println(index + ". " + game.gameName());
+                System.out.println("    whitePlayer: " + game.whiteUsername());
+                System.out.println("    blackPlayer: " + game.blackUsername());
             }
             return true;
         } catch (ResponseException e) {

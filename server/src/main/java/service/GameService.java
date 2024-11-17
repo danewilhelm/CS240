@@ -36,7 +36,6 @@ public class GameService {
         if (request.gameName() == null) {
             throw new BadRequestException("Error: bad request");
         }
-        System.out.println(request.authToken());
         if (authDAOInstance.getAuth(request.authToken()) == null) {
             throw new UnauthorizedException("Error: unauthorized create game");
         }
