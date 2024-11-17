@@ -91,7 +91,7 @@ public class ClientCommunicator {
             authToken = result.authToken();
             return true;
         } catch (ResponseException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             return false;
         }
     }
@@ -107,7 +107,7 @@ public class ClientCommunicator {
             authToken = result.authToken();
             return true;
         } catch (ResponseException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             return false;
         }
     }
@@ -122,7 +122,7 @@ public class ClientCommunicator {
             makeRequest("PUT","/game", body, null);
             return true;
         } catch (ResponseException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             return false;
         }
     }
@@ -132,7 +132,7 @@ public class ClientCommunicator {
             makeRequest("DELETE","/session", null, null);
             return true;
         } catch (ResponseException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             return false;
         }
     }
@@ -142,7 +142,7 @@ public class ClientCommunicator {
             ListGamesResult result = makeRequest("GET","/game", null, ListGamesResult.class);
             return result.games();
         } catch (ResponseException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             return null;
         }
     }
@@ -152,7 +152,7 @@ public class ClientCommunicator {
             makeRequest("DELETE","/db", null, null);
             return true;
         } catch (ResponseException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             return false;
         }
     }
@@ -163,7 +163,7 @@ public class ClientCommunicator {
             makeRequest("POST","/game", body, null);
             return true;
         } catch (ResponseException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             return false;
         }
     }
