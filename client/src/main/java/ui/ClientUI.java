@@ -94,14 +94,15 @@ public class ClientUI {
     private void attemptObserveGame(String[] input) {
         if (input.length != 2) {
             System.out.println("Missing input: observe <ID>");
+            System.out.println("Find the correct ID by searching the games list");
             return;
         }
 
-        if (input[1].matches("\\d")) {
+        if (! input[1].matches("\\d")) {
             System.out.println("Incorrect input: ID must be a number");
+            System.out.println("Find the correct ID by searching the games list");
             return;
         }
-
         Collection<GameData> gamesList = serverFacade.listGames();
     }
 
@@ -120,6 +121,7 @@ public class ClientUI {
                 System.out.println(indexGameID + ". " + game.gameName());
                 System.out.println("    whitePlayer: " + game.whiteUsername());
                 System.out.println("    blackPlayer: " + game.blackUsername());
+                indexGameID++;
             }
         }
     }
@@ -130,11 +132,16 @@ public class ClientUI {
             return;
         }
 
+        if (! input[1].matches("\\d")) {
+            System.out.println("Incorrect input: ID must be a number");
+            System.out.println("Find the correct ID by searching the games list");
+            return;
+        }
+
         String joinColor = input[2].toUpperCase();
         if (! (joinColor.equals("WHITE") || joinColor.equals("BLACK"))) {
             System.out.println("incorrect input: the team color must be WHITE or BLACK");
         }
-
 
         if (serverFacade.joinGame(input[2], Integer.parseInt(input[1]))) {
             System.out.println("Successfully joined game");
@@ -156,7 +163,7 @@ public class ClientUI {
 
     private void printLoggedInHelp() {
         System.out.println("create <NAME> - create a game");
-        System.out.println("list - see unlimited games, but no bacon");
+        System.out.println("list - see all games and their gameID's");
         System.out.println("join <ID> [WHITE|BLACK] - join a game");
         System.out.println("observe <ID> - watch your friend lose");
         System.out.println("logout - when you are done");
@@ -172,8 +179,10 @@ public class ClientUI {
             return;
         }
 
-        String[] gameNameArray = Arrays.copyOfRange(input, 1, input.length);
-        String gameName = Arrays.toString(gameNameArray);
+        String gameName = input[1];
+        for (int i = 2; i < input.length; i++) {
+            gameName = gameName + " " + input[i];
+        }
 
         if (serverFacade.createGame(gameName)) {
             System.out.println("Successfully created game");
