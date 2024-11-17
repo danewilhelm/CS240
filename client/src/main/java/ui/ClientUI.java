@@ -3,6 +3,8 @@ package ui;
 import client.ServerFacade;
 import model.GameData;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Scanner;
 
@@ -165,12 +167,15 @@ public class ClientUI {
 
 
     private void attemptCreateGame(String[] input) {
-        if (input.length != 2) {
+        if (input.length == 1) {
             System.out.println("Missing input: create <NAME> - create a game");
             return;
         }
 
-        if (serverFacade.createGame(input[1])) {
+        String[] gameNameArray = Arrays.copyOfRange(input, 1, input.length);
+        String gameName = Arrays.toString(gameNameArray);
+
+        if (serverFacade.createGame(gameName)) {
             System.out.println("Successfully created game");
         } else {
             System.out.println("Failed to register. Try again");
