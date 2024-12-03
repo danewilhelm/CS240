@@ -3,8 +3,6 @@ package ui;
 import client.ServerFacade;
 import model.GameData;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Scanner;
 
@@ -118,7 +116,7 @@ public class ClientUI {
         if (observedGame == null) {
             System.out.println("Incorrect input: There is no game associated with this ID");
         } else {
-            ChessBoardUI.observe();
+            ChessBoardUI.observePhase5();
         }
 
     }

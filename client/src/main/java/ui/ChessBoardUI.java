@@ -1,11 +1,10 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static ui.EscapeSequences.*;
 
@@ -18,45 +17,75 @@ public class ChessBoardUI {
     private PrintStream out;
 
     private ChessBoard board;
-    private boolean isWhitePerspective;
+    private final boolean IS_WHITE_PERSPECTIVE;
 
     private int sideHeaderIndex;
 
     private int curRow;
     private int curCol;
 
+    ChessPosition highlightedPosition;
+    Collection<ChessPosition> legalMovePositions = new ArrayList<>();
 
-    public ChessBoardUI (ChessGame game, ChessGame.TeamColor teamColor) {
+    public ChessBoardUI (ChessGame game, ChessGame.TeamColor teamColor, ChessPosition highlightedPosition) {
         out = new PrintStream(System.out, true);
         out.print(SET_TEXT_BOLD);
 
         board = game.getBoard();
-        isWhitePerspective = teamColor.equals(ChessGame.TeamColor.WHITE);
+        IS_WHITE_PERSPECTIVE = teamColor.equals(ChessGame.TeamColor.WHITE);
 
-        sideHeaderIndex = isWhitePerspective ? 0 : 7;
+        sideHeaderIndex = IS_WHITE_PERSPECTIVE ? 0 : 7;
 
-        if (isWhitePerspective) {
+        if (IS_WHITE_PERSPECTIVE) {
             curRow = 8;
             curCol = 1;
         } else {
             curRow = 1;
             curCol = 8;
         }
-    }
-    
-    
-    public static void main(String[] args) {
-        observe();
+
+        this.highlightedPosition = highlightedPosition;
+        if (highlightedPosition != null) {
+            Collection<ChessMove> legalMoves = board.getPiece(highlightedPosition).pieceMoves(board, highlightedPosition);
+            for (ChessMove move : legalMoves) {
+                this.legalMovePositions.add(move.getEndPosition());
+            }
+        }
     }
 
-    public static void observe() {
+    // ------------------------------------ TESTING AND MAIN ----------------------------------------------------------
+    public static void main(String[] args) {
+        observePhase5();
+    }
+
+    public static void observePhase5() {
         ChessGame game = new ChessGame();
         game.getBoard().resetBoard();
 
-        ChessBoardUI blackPlayerPrinter = new ChessBoardUI(game, ChessGame.TeamColor.BLACK);
-        ChessBoardUI whitePlayerPrinter = new ChessBoardUI(game, ChessGame.TeamColor.WHITE);
+        ChessBoardUI blackPlayerPrinter = new ChessBoardUI(game, ChessGame.TeamColor.BLACK, null);
+        ChessBoardUI whitePlayerPrinter = new ChessBoardUI(game, ChessGame.TeamColor.WHITE, null);
         blackPlayerPrinter.drawChessBoardUI();
         whitePlayerPrinter.drawChessBoardUI();
+    }
+
+    public static void testHighlightLegalMoves(ChessPosition givenPosition) {
+        ChessGame game = new ChessGame();
+        game.getBoard().resetBoard();
+
+        ChessBoardUI blackPlayerPrinter = new ChessBoardUI(game, ChessGame.TeamColor.BLACK, null);
+    }
+
+    // ---------------------------------- Highlighting Moves helper methods ------------------------
+
+    private boolean isWhiteSquare(ChessPosition pos) {
+        boolean isOddRow = pos.getRow() % 2 == 1;
+        boolean isOddColumn = pos.getColumn() % 2 == 1;
+
+        if ((isOddRow && isOddColumn) || (!isOddRow && !isOddColumn)) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 
@@ -104,7 +133,7 @@ public class ChessBoardUI {
     // ------------------------------------- Drawing Headers --------------------------------------------
     private void drawColumnHeader() {
         setHeaderColoring();
-        out.print(isWhitePerspective ? whiteColumnHeader : blackColumnHeader);
+        out.print(IS_WHITE_PERSPECTIVE ? whiteColumnHeader : blackColumnHeader);
         printNewLine();
     }
 
@@ -115,23 +144,50 @@ public class ChessBoardUI {
     }
 
     private void setHeaderColoring() {
-        out.print(SET_BG_COLOR_LIGHT_GREY);
-        out.print(SET_TEXT_COLOR_BLACK);
+        out.print(SET_BG_COLOR_BLACK);
+        out.print(SET_TEXT_COLOR_BRIGHT_GOLD);
     }
 
     // ------------------------------------- ChessBoard Drawing Helper Methods -----------------------------------------
-    private void drawBlackSquare() {
-        out.print(SET_BG_COLOR_BLACK);
+    private void drawWhiteSquare() {
+        if (isLegalMovePosition()) {
+            out.print(SET_BG_COLOR_GREEN);
+            out.print(SET_TEXT_COLOR_BLACK);
+        } else if (isStartPosition()) {
+            out.print(SET_BG_COLOR_YELLOW);
+            out.print(SET_TEXT_COLOR_BLACK);
+        } else {
+            out.print(SET_BG_COLOR_GOLD);
+        }
+
         out.print(" ");
         drawChessPiece();
         out.print(" ");
     }
 
-    private void drawWhiteSquare() {
-        out.print(SET_BG_COLOR_WHITE);
+    private void drawBlackSquare() {
+        if (isLegalMovePosition()) {
+            out.print(SET_BG_COLOR_DARK_GREEN);
+            out.print(SET_TEXT_COLOR_BLACK);
+        } else if (isStartPosition()) {
+            out.print(SET_BG_COLOR_YELLOW);
+            out.print(SET_TEXT_COLOR_BLACK);
+        } else {
+            out.print(SET_BG_COLOR_DARK_GOLD);
+        }
+
         out.print(" ");
         drawChessPiece();
         out.print(" ");
+    }
+
+    private boolean isLegalMovePosition() {
+        ChessPosition curPosition = new ChessPosition(curRow, curCol);
+        return legalMovePositions != null && legalMovePositions.contains(curPosition);
+    }
+
+    private boolean isStartPosition() {
+        return highlightedPosition != null && highlightedPosition.equals(new ChessPosition(curRow, curCol));
     }
 
     private void drawChessPiece() {
@@ -156,9 +212,9 @@ public class ChessBoardUI {
 
     private void setPieceColoring(ChessPiece curPiece) {
         if (curPiece.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
-            out.print(SET_TEXT_COLOR_RED);
+            out.print(SET_TEXT_COLOR_WHITE);
         } else {
-            out.print(SET_TEXT_COLOR_BLUE);
+            out.print(SET_TEXT_COLOR_BLACK);
         }
     }
 
@@ -166,7 +222,7 @@ public class ChessBoardUI {
 
     // ---------------------------------- Incrementing Helper Methods ----------------------------------------
     private void incrementChessPosition() {
-        if (isWhitePerspective) {
+        if (IS_WHITE_PERSPECTIVE) {
             if (curCol == 8) {
                     curCol = 1;
                     curRow--;
@@ -185,7 +241,7 @@ public class ChessBoardUI {
     }
 
     private void incrementSideHeader() {
-        if (isWhitePerspective) {
+        if (IS_WHITE_PERSPECTIVE) {
             sideHeaderIndex++;
         } else {
             sideHeaderIndex--;
