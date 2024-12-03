@@ -55,7 +55,7 @@ public class ChessBoardUI {
 
     // ------------------------------------ TESTING AND MAIN ----------------------------------------------------------
     public static void main(String[] args) {
-        observePhase5();
+        testHighlightLegalMoves();
     }
 
     public static void observePhase5() {
@@ -68,11 +68,15 @@ public class ChessBoardUI {
         whitePlayerPrinter.drawChessBoardUI();
     }
 
-    public static void testHighlightLegalMoves(ChessPosition givenPosition) {
+    public static void testHighlightLegalMoves() {
         ChessGame game = new ChessGame();
         game.getBoard().resetBoard();
 
-        ChessBoardUI blackPlayerPrinter = new ChessBoardUI(game, ChessGame.TeamColor.BLACK, null);
+        ChessBoardUI blackPlayerPrinter = new ChessBoardUI(game, ChessGame.TeamColor.BLACK, new ChessPosition(2, 2));
+        blackPlayerPrinter.drawChessBoardUI();
+
+        ChessBoardUI otherBlackPlayerPrinter = new ChessBoardUI(game, ChessGame.TeamColor.BLACK, new ChessPosition(2, 3));
+        otherBlackPlayerPrinter.drawChessBoardUI();
     }
 
     // ---------------------------------- Highlighting Moves helper methods ------------------------
@@ -150,12 +154,10 @@ public class ChessBoardUI {
 
     // ------------------------------------- ChessBoard Drawing Helper Methods -----------------------------------------
     private void drawWhiteSquare() {
-        if (isLegalMovePosition()) {
-            out.print(SET_BG_COLOR_GREEN);
-            out.print(SET_TEXT_COLOR_BLACK);
-        } else if (isStartPosition()) {
+        if (isStartPosition()) {
+            out.print(SET_BG_COLOR_BLUE);
+        } else if (isLegalMovePosition()) {
             out.print(SET_BG_COLOR_YELLOW);
-            out.print(SET_TEXT_COLOR_BLACK);
         } else {
             out.print(SET_BG_COLOR_GOLD);
         }
@@ -166,14 +168,12 @@ public class ChessBoardUI {
     }
 
     private void drawBlackSquare() {
-        if (isLegalMovePosition()) {
-            out.print(SET_BG_COLOR_DARK_GREEN);
-            out.print(SET_TEXT_COLOR_BLACK);
-        } else if (isStartPosition()) {
-            out.print(SET_BG_COLOR_YELLOW);
-            out.print(SET_TEXT_COLOR_BLACK);
+        if (isStartPosition()) {
+            out.print(SET_BG_COLOR_BLUE);
+        } else if (isLegalMovePosition()) {
+            out.print(SET_BG_COLOR_GREEN);
         } else {
-            out.print(SET_BG_COLOR_DARK_GOLD);
+            out.print(SET_BG_COLOR_DARK_GREEN);
         }
 
         out.print(" ");
