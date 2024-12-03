@@ -158,6 +158,7 @@ public class ChessBoardUI {
             out.print(SET_BG_COLOR_BLUE);
         } else if (isLegalMovePosition()) {
             out.print(SET_BG_COLOR_YELLOW);
+            out.print(SET_TEXT_COLOR_BLACK);
         } else {
             out.print(SET_BG_COLOR_GOLD);
         }
@@ -172,6 +173,7 @@ public class ChessBoardUI {
             out.print(SET_BG_COLOR_BLUE);
         } else if (isLegalMovePosition()) {
             out.print(SET_BG_COLOR_GREEN);
+            out.print(SET_TEXT_COLOR_BLACK);
         } else {
             out.print(SET_BG_COLOR_DARK_GREEN);
         }
