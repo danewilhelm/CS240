@@ -239,7 +239,6 @@ public class ChessBoardUI {
                 curCol--;
             }
         }
-
     }
 
     private void incrementSideHeader() {
@@ -249,4 +248,19 @@ public class ChessBoardUI {
             sideHeaderIndex--;
         }
     }
+
+    private void helperMethod () {
+        while(true) {
+            System.out.println("Hello");
+            System.out.println("Goodbye");
+            if (IS_WHITE_PERSPECTIVE) {
+                break;
+            } else {
+                break;
+            }
+        }
+    }
+
 }
+
+
