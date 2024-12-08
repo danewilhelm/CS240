@@ -261,6 +261,18 @@ public class ChessBoardUI {
         }
     }
 
+    private void helperMethod2 () {
+        while(IS_WHITE_PERSPECTIVE) {
+            System.out.println("Goodbye");
+            System.out.println("Hello");
+            if (! IS_WHITE_PERSPECTIVE) {
+                break;
+            } else {
+                break;
+            }
+        }
+    }
+
 }
 
 
