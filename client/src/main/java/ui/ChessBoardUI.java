@@ -273,6 +273,21 @@ public class ChessBoardUI {
         }
     }
 
+    private void debugMethod () {
+        while (IS_WHITE_PERSPECTIVE) {
+            System.out.println("FLAG");
+            if (curCol == 4) {
+                break;
+            }
+        }
+    }
+
+
+
+
+
+
+
 }
 
 
