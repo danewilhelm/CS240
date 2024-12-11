@@ -24,6 +24,9 @@ public class Server {
         UserHandler userHandlerInstance = new UserHandler(authDAOInstance, gameDAOInstance, userDAOInstance);
 
         // Register your endpoints and handle exceptions here.
+
+        Spark.webSocket("/connect", );
+
         Spark.post("/user", userHandlerInstance::handleRegister);
         Spark.post("/session", userHandlerInstance::handleLogin);
         Spark.delete("/session", userHandlerInstance::handleLogout);

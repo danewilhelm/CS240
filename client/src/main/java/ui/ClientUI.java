@@ -8,8 +8,11 @@ import java.util.Scanner;
 
 public class ClientUI {
 
-    private boolean isRunning = true;
-    private boolean isLoggedIn = false;
+    private boolean isRunning;
+    private boolean isLoggedIn;
+    private boolean isInGame;
+    private boolean isObserver;
+
     private ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
 
 
@@ -30,6 +33,10 @@ public class ClientUI {
         System.out.println("Welcome to CS 240 chess. Type help to get started (^v^)");
 
         isRunning = true;
+        isLoggedIn = false;
+        isInGame = false;
+        isObserver = false;
+
         while (isRunning) {
             String[] input = getInput("LOGGED_OUT");
             String command = input[0].toLowerCase();
@@ -88,6 +95,67 @@ public class ClientUI {
         }
     }
 
+    private void gameLoop() {
+        while (isRunning && isLoggedIn && isInGame) {
+            String[] input = getInput("IN_GAME");
+            String command = input[0].toLowerCase();
+            switch (command) {
+                case "help":
+                    printInGameHelp();
+                    break;
+                case "redraw":
+                    redrawBoard();
+                    break;
+                case "leave":
+                    leaveGame();
+                    break;
+                case "move":
+                    attemptMove(input);
+                    break;
+                case "resign":
+                    resignGame();
+                    break;
+                case "highlight":
+                    highlightMoves();
+                    break;
+                default:
+                    System.out.println("oi bruv, I don't understand what you want");
+            }
+        }
+    }
+
+
+
+
+    // --------------------------- Game Loop Helper Methods ---------------------------------------------------------
+    private void printInGameHelp() {
+        System.out.println("help - oi bruv, you lookin' at it");
+        System.out.println("redraw - artist has to redraw the chess board, again...");
+        System.out.println("leave - leaving the game so soon?");
+        System.out.println("move <starting position of moving piece> <ending position of moving piece> - Ex: \"move c4 c5\" when moving a pawn");
+        System.out.println("resign - gg I guess");
+        System.out.println("highlight <location on board> - highlights possible moves for a given location on the board. Ex: \"highlight b6\"");
+    }
+
+    private void redrawBoard() {
+
+    }
+
+    private void leaveGame() {
+    }
+
+    private void attemptMove(String[] input) {
+    }
+
+    private void resignGame() {
+    }
+
+    private void highlightMoves() {
+    }
+
+
+
+
     // ---------------------------- Post-Login Helper Methods --------------------------------------------------------
     private void attemptObserveGame(String[] input) {
         if (input.length != 2) {
@@ -116,7 +184,10 @@ public class ClientUI {
         if (observedGame == null) {
             System.out.println("Incorrect input: There is no game associated with this ID");
         } else {
-            ChessBoardUI.observePhase5();
+            // INCOMPLETE: NEEDS TO CONNECT OBSERVER VIA WEBSOCKET
+            // INCOMPLETE: NEEDS TO DRAW THE BOARD INITIALLY
+            isObserver = true;
+            System.out.println("Successfully observing game");
         }
 
     }
@@ -159,8 +230,10 @@ public class ClientUI {
         }
 
         if (serverFacade.joinGame(input[2], Integer.parseInt(input[1]))) {
-            System.out.println("Successfully joined game");
-            postLoginLoop();
+            // INCOMPLETE: NEEDS TO CONNECT PLAYER VIA WEBSOCKET
+            // INCOMPLETE: NEEDS TO DRAW THE BOARD INITIALLY
+            System.out.println("Successfully joined game as player");
+            gameLoop();
         } else {
             System.out.println("Failed to join game. Try again");
         }
