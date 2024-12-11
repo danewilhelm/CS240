@@ -11,6 +11,7 @@ public class WebsocketCommunicator extends Endpoint {
 
     public WebsocketCommunicator(String entireURL) throws Exception {
         URI uri = new URI("ws://localhost:8080/connect");
+        // INCOMPLETE: NEEDS TO DYNAMICALLY CONNECT TO THE URL IT IS GIVEN
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, uri);
 

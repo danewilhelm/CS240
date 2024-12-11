@@ -1,10 +1,12 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessPosition;
 import client.ServerFacade;
 import model.GameData;
 
 import java.util.Collection;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class ClientUI {
@@ -110,7 +112,7 @@ public class ClientUI {
                     printInGameHelp();
                     break;
                 case "redraw":
-                    drawBoard();
+                    drawBoard(null);
                     break;
                 case "leave":
                     leaveGame();
@@ -122,7 +124,7 @@ public class ClientUI {
                     resignGame();
                     break;
                 case "highlight":
-                    highlightMoves();
+                    highlightPosition(input);
                     break;
                 default:
                     System.out.println("oi bruv, I don't understand what you want");
@@ -143,15 +145,79 @@ public class ClientUI {
         System.out.println("highlight <location on board> - highlights possible moves for a given location on the board. Ex: \"highlight b6\"");
     }
 
-    private void drawBoard() {
+    private void drawBoard(ChessPosition highlightedPosition) {
         GameData joinedGame = getJoinedGame();
         if (joinedGame == null) {
             System.out.println("ERROR: server did not find your game, and cannot draw it");
             return;
         }
 
-        ChessBoardUI boardUI = new ChessBoardUI()
 
+
+        ChessBoardUI boardUI = new ChessBoardUI(joinedGame.game(), teamPerspective, highlightedPosition);
+        boardUI.drawChessBoardUI();
+    }
+
+    private void highlightPosition(String[] input) {
+        if (input.length < 2) {
+            System.out.println("Missing input: highlight <location on board> - highlights possible moves for a given location on the board. Ex: \"highlight b6\"");
+            return;
+        }
+
+        String selectedCoordinates = input[1];
+        try {
+            ChessPosition highlightedPosition = parseCoordinates(selectedCoordinates);
+            drawBoard(highlightedPosition);
+        } catch (InputMismatchException e) {
+            System.out.println("Highlighting failed. Please try again");
+        }
+    }
+
+    private ChessPosition parseCoordinates(String selectedCoordinates) throws InputMismatchException {
+        if (selectedCoordinates == null) {
+            return null;
+        }
+
+        if (! selectedCoordinates.matches("^[a-hA-H]$")) {
+            System.out.println("the coordinates you gave are not valid. Try the following format: B6, or c2");
+            throw new InputMismatchException();
+        }
+
+        int givenRow = selectedCoordinates.charAt(1) - '0';
+
+        char givenColChar = selectedCoordinates.charAt(0);
+        int givenCol;
+        switch (givenColChar) {
+            case 'a':
+                givenCol = 1;
+                break;
+            case 'b':
+                givenCol = 2;
+                break;
+            case 'c':
+                givenCol = 3;
+                break;
+            case 'd':
+                givenCol = 4;
+                break;
+            case 'e':
+                givenCol = 5;
+                break;
+            case 'f':
+                givenCol = 6;
+                break;
+            case 'g':
+                givenCol = 7;
+                break;
+            case 'h':
+                givenCol = 8;
+                break;
+            default:
+                System.out.println("ERROR: did not parse coordinates correctly");
+                return null;
+        }
+
+        return new ChessPosition(givenRow, givenCol);
     }
 
     private void leaveGame() {
@@ -161,9 +227,6 @@ public class ClientUI {
     }
 
     private void resignGame() {
-    }
-
-    private void highlightMoves() {
     }
 
     private GameData getJoinedGame() {
@@ -208,7 +271,7 @@ public class ClientUI {
             System.out.println("Incorrect input: There is no game associated with this ID");
         } else {
             // INCOMPLETE: NEEDS TO CONNECT OBSERVER VIA WEBSOCKET
-            drawBoard();
+            drawBoard(null);
             isObserver = true;
             teamPerspective = ChessGame.TeamColor.WHITE;
             System.out.println("Successfully observing game");
@@ -259,7 +322,7 @@ public class ClientUI {
         if (serverFacade.joinGame(joinColor, Integer.parseInt(attemptedGameID))) {
             // INCOMPLETE: NEEDS TO CONNECT PLAYER VIA WEBSOCKET
             joinedGameID = Integer.parseInt(attemptedGameID);
-            drawBoard();
+            drawBoard(null);
             System.out.println("Successfully joined game as player");
             gameLoop();
         } else {

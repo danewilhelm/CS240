@@ -95,7 +95,7 @@ public class ChessBoardUI {
 
     // ---------------------------------- Creating the entire board---------------------------------
 
-    private void drawChessBoardUI() {
+    public void drawChessBoardUI() {
         printNewLine();
         drawColumnHeader();
         drawMiddleRows();
