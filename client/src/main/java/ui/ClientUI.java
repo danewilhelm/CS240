@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import client.ServerFacade;
 import model.GameData;
 
@@ -12,6 +13,9 @@ public class ClientUI {
     private boolean isLoggedIn;
     private boolean isInGame;
     private boolean isObserver;
+
+    private ChessGame.TeamColor teamPerspective;
+    private Integer joinedGameID;
 
     private ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
 
@@ -36,6 +40,8 @@ public class ClientUI {
         isLoggedIn = false;
         isInGame = false;
         isObserver = false;
+
+        joinedGameID = null;
 
         while (isRunning) {
             String[] input = getInput("LOGGED_OUT");
@@ -104,7 +110,7 @@ public class ClientUI {
                     printInGameHelp();
                     break;
                 case "redraw":
-                    redrawBoard();
+                    drawBoard();
                     break;
                 case "leave":
                     leaveGame();
@@ -137,7 +143,14 @@ public class ClientUI {
         System.out.println("highlight <location on board> - highlights possible moves for a given location on the board. Ex: \"highlight b6\"");
     }
 
-    private void redrawBoard() {
+    private void drawBoard() {
+        GameData joinedGame = getJoinedGame();
+        if (joinedGame == null) {
+            System.out.println("ERROR: server did not find your game, and cannot draw it");
+            return;
+        }
+
+        ChessBoardUI boardUI = new ChessBoardUI()
 
     }
 
@@ -153,7 +166,17 @@ public class ClientUI {
     private void highlightMoves() {
     }
 
+    private GameData getJoinedGame() {
+        Collection<GameData> listedGames = serverFacade.listGames();
+        GameData joinedGameData;
 
+        for (GameData curGame : listedGames) {
+            if (curGame.gameID() == joinedGameID) {
+                return curGame;
+            }
+        }
+        return null;
+    }
 
 
     // ---------------------------- Post-Login Helper Methods --------------------------------------------------------
@@ -185,8 +208,9 @@ public class ClientUI {
             System.out.println("Incorrect input: There is no game associated with this ID");
         } else {
             // INCOMPLETE: NEEDS TO CONNECT OBSERVER VIA WEBSOCKET
-            // INCOMPLETE: NEEDS TO DRAW THE BOARD INITIALLY
+            drawBoard();
             isObserver = true;
+            teamPerspective = ChessGame.TeamColor.WHITE;
             System.out.println("Successfully observing game");
         }
 
@@ -218,7 +242,8 @@ public class ClientUI {
             return;
         }
 
-        if (! input[1].matches("\\d+")) {
+        String attemptedGameID = input[1];
+        if (! attemptedGameID.matches("\\d+")) {
             System.out.println("Incorrect input: ID must be a number");
             System.out.println("Find the correct ID by searching the games list");
             return;
@@ -229,15 +254,26 @@ public class ClientUI {
             System.out.println("incorrect input: the team color must be WHITE or BLACK");
         }
 
-        if (serverFacade.joinGame(input[2], Integer.parseInt(input[1]))) {
+        setPerspective(joinColor);
+
+        if (serverFacade.joinGame(joinColor, Integer.parseInt(attemptedGameID))) {
             // INCOMPLETE: NEEDS TO CONNECT PLAYER VIA WEBSOCKET
-            // INCOMPLETE: NEEDS TO DRAW THE BOARD INITIALLY
+            joinedGameID = Integer.parseInt(attemptedGameID);
+            drawBoard();
             System.out.println("Successfully joined game as player");
             gameLoop();
         } else {
             System.out.println("Failed to join game. Try again");
         }
 
+    }
+
+    private void setPerspective(String joinColor) {
+        if (joinColor.equals("WHITE")) {
+            teamPerspective = ChessGame.TeamColor.WHITE;
+        } else if (joinColor.equals("BLACK")) {
+            teamPerspective = ChessGame.TeamColor.BLACK;
+        }
     }
 
     private void attemptLogout() {

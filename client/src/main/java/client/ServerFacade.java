@@ -12,6 +12,11 @@ public class ServerFacade {
         http = new ClientCommunicator(this, serverURL);
     }
 
+    // -------------------------------------Websocket connections-----------------------------------------
+
+
+    // -------------------------------------HTTP connections------------------------------------------------------
+
     public boolean register(String username, String password, String email) {
         return http.register(username, password, email);
     }
