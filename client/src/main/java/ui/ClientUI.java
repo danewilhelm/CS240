@@ -1,22 +1,25 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import client.ServerFacade;
 import model.GameData;
+import service.BadRequestException;
 
 import java.util.Collection;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+
 public class ClientUI {
 
     private boolean isRunning;
     private boolean isLoggedIn;
-    private boolean isInGame;
     private boolean isObserver;
 
-    private ChessGame.TeamColor teamPerspective;
+    private String teamPerspective;
     private Integer joinedGameID;
 
     private ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
@@ -40,10 +43,6 @@ public class ClientUI {
 
         isRunning = true;
         isLoggedIn = false;
-        isInGame = false;
-        isObserver = false;
-
-        joinedGameID = null;
 
         while (isRunning) {
             String[] input = getInput("LOGGED_OUT");
@@ -54,7 +53,7 @@ public class ClientUI {
                     break;
                 case "quit":
                     System.out.println("Goodbye :(");
-                    isRunning=false;
+                    isRunning = false;
                     break;
                 case "register":
                     attemptRegister(input);
@@ -71,7 +70,10 @@ public class ClientUI {
 
 
     private void postLoginLoop() {
+
         while (isRunning && isLoggedIn) {
+            isObserver = false;
+            joinedGameID = null;
             String[] input = getInput("LOGGED_IN");
             String command = input[0].toLowerCase();
             switch (command) {
@@ -104,7 +106,7 @@ public class ClientUI {
     }
 
     private void gameLoop() {
-        while (isRunning && isLoggedIn && isInGame) {
+        while (true) {
             String[] input = getInput("IN_GAME");
             String command = input[0].toLowerCase();
             switch (command) {
@@ -116,7 +118,7 @@ public class ClientUI {
                     break;
                 case "leave":
                     leaveGame();
-                    break;
+                    return;
                 case "move":
                     attemptMove(input);
                     break;
@@ -140,7 +142,9 @@ public class ClientUI {
         System.out.println("help - oi bruv, you lookin' at it");
         System.out.println("redraw - artist has to redraw the chess board, again...");
         System.out.println("leave - leaving the game so soon?");
-        System.out.println("move <starting position of moving piece> <ending position of moving piece> - Ex: \"move c4 c5\" when moving a pawn");
+        System.out.println("move <starting position of moving piece> <ending position of moving piece> - " +
+                "\n     Ex: \"move c4 c5\" when moving a pawn" +
+                "\n     Ex: \"move C7 C8 Q\" to move and promote a pawn to a queen");
         System.out.println("resign - gg I guess");
         System.out.println("highlight <location on board> - highlights possible moves for a given location on the board. Ex: \"highlight b6\"");
     }
@@ -151,8 +155,6 @@ public class ClientUI {
             System.out.println("ERROR: server did not find your game, and cannot draw it");
             return;
         }
-
-
 
         ChessBoardUI boardUI = new ChessBoardUI(joinedGame.game(), teamPerspective, highlightedPosition);
         boardUI.drawChessBoardUI();
@@ -165,51 +167,55 @@ public class ClientUI {
         }
 
         String selectedCoordinates = input[1];
+        ChessPosition highlightedPosition;
         try {
-            ChessPosition highlightedPosition = parseCoordinates(selectedCoordinates);
-            drawBoard(highlightedPosition);
-        } catch (InputMismatchException e) {
-            System.out.println("Highlighting failed. Please try again");
+             highlightedPosition = parseCoordinates(selectedCoordinates);
+        } catch (BadRequestException e) {
+            return;
         }
+
+        if (highlightedPosition == null) {
+            System.out.println("Highlighting failed. Please try again");
+            return;
+        }
+
+        drawBoard(highlightedPosition);
     }
 
-    private ChessPosition parseCoordinates(String selectedCoordinates) throws InputMismatchException {
-        if (selectedCoordinates == null) {
-            return null;
-        }
-
-        if (! selectedCoordinates.matches("^[a-hA-H]$")) {
+    private ChessPosition parseCoordinates(String selectedCoordinates) throws BadRequestException {
+        String givenColString = selectedCoordinates.charAt(0) + "";
+        givenColString = givenColString.toLowerCase();
+        if (! givenColString.matches("^[a-h]$")) {
             System.out.println("the coordinates you gave are not valid. Try the following format: B6, or c2");
-            throw new InputMismatchException();
+            throw new BadRequestException("");
         }
 
         int givenRow = selectedCoordinates.charAt(1) - '0';
 
-        char givenColChar = selectedCoordinates.charAt(0);
         int givenCol;
-        switch (givenColChar) {
-            case 'a':
+        switch (givenColString) {
+            case "a":
                 givenCol = 1;
                 break;
-            case 'b':
+            case "b":
                 givenCol = 2;
                 break;
-            case 'c':
+            case "c":
                 givenCol = 3;
                 break;
-            case 'd':
+            case "d":
                 givenCol = 4;
                 break;
-            case 'e':
+            case "e":
                 givenCol = 5;
                 break;
-            case 'f':
+            case "f":
                 givenCol = 6;
                 break;
-            case 'g':
+            case "g":
                 givenCol = 7;
                 break;
-            case 'h':
+            case "h":
                 givenCol = 8;
                 break;
             default:
@@ -221,20 +227,67 @@ public class ClientUI {
     }
 
     private void leaveGame() {
+        isObserver = false;
+        // TODO:
+        serverFacade.leaveGame(Integer.parseInt(attemptedGameID));
     }
 
     private void attemptMove(String[] input) {
+        if (input.length < 3) {
+            System.out.println("missing input to make a move");
+        }
+
+        ChessPosition startPosition;
+        ChessPosition endPosition;
+        ChessPiece.PieceType promotionPiece = null;
+
+        try {
+            startPosition = parseCoordinates(input[1]);
+            endPosition = parseCoordinates(input[2]);
+        } catch (BadRequestException e) {
+            return;
+        }
+
+        if (input.length == 4) {
+            if (input[3].length() > 1) {
+                System.out.println("The format for promotion pieces should be a single character as seen on the board");
+                return;
+            }
+
+            promotionPiece = parsePromotionPiece(input[3]);
+        }
+
+        ChessMove attemptedMove = new ChessMove(startPosition, endPosition, promotionPiece);
+        // TODO:
     }
 
+//    private ChessPiece.PieceType parsePromotionPiece(String str) {
+//        String string = s.toUpperCase() + "";
+//        ChessPiece.PieceType promotionPiece;
+//        switch (s) {
+//            case "Q":
+//                promotionPiece = ChessPiece.PieceType.QUEEN;
+//                break;
+//            case "K":
+//                promotionPiece = ChessPiece.PieceType.KING;
+//        }
+//    }
+
+
+
     private void resignGame() {
+        // TODO:
     }
 
     private GameData getJoinedGame() {
+        return getGameFromID(joinedGameID);
+    }
+
+    private GameData getGameFromID(int givenGameID) {
         Collection<GameData> listedGames = serverFacade.listGames();
-        GameData joinedGameData;
 
         for (GameData curGame : listedGames) {
-            if (curGame.gameID() == joinedGameID) {
+            if (curGame.gameID() == givenGameID) {
                 return curGame;
             }
         }
@@ -250,6 +303,7 @@ public class ClientUI {
             return;
         }
 
+
         if (! input[1].matches("\\d+")) {
             System.out.println("Incorrect input: ID must be a number");
             System.out.println("Find the correct ID by searching the games list");
@@ -258,25 +312,65 @@ public class ClientUI {
 
         int givenGameID = Integer.parseInt(input[1]);
 
-
-        Collection<GameData> gamesList = serverFacade.listGames();
-        GameData observedGame = null;
-        for (GameData curGame: gamesList) {
-            if (curGame.gameID() == givenGameID) {
-                observedGame = curGame;
-            }
-        }
-
+        GameData observedGame = getGameFromID(givenGameID);
         if (observedGame == null) {
             System.out.println("Incorrect input: There is no game associated with this ID");
-        } else {
-            // INCOMPLETE: NEEDS TO CONNECT OBSERVER VIA WEBSOCKET
-            drawBoard(null);
-            isObserver = true;
-            teamPerspective = ChessGame.TeamColor.WHITE;
-            System.out.println("Successfully observing game");
+            return;
         }
 
+        if (! serverFacade.joinGame(null, givenGameID)) {
+            System.out.println("failed to connect observer");
+            return;
+        }
+
+        // TODO: verify this is done correctly with the observer having NO team
+
+        joinedGameID = givenGameID;
+        teamPerspective = "WHITE";
+        drawBoard(null);
+        isObserver = true;
+        System.out.println("Successfully observing game");
+        gameLoop();
+    }
+
+
+
+    private void attemptJoinGame(String[] input) {
+        if (input.length != 3) {
+            System.out.println("missing input: join <ID> [WHITE|BLACK] - join a game");
+            return;
+        }
+
+        String attemptedGameID = input[1];
+        if (! attemptedGameID.matches("\\d+")) {
+            System.out.println("Incorrect input: ID must be a number");
+            System.out.println("Find the correct ID by searching the games list");
+            return;
+        }
+
+        String joinColor = input[2].toUpperCase();
+        if (! (joinColor.equals("WHITE") || joinColor.equals("BLACK"))) {
+            System.out.println("incorrect input: the team color must be WHITE or BLACK");
+            return;
+        }
+
+
+        if (! serverFacade.joinGame(joinColor, Integer.parseInt(attemptedGameID))) {
+            System.out.println("Failed to join game. Try again");
+            return;
+        }
+
+        if (! serverFacade.connectPlayer(joinColor, Integer.parseInt(attemptedGameID))) {
+            System.out.println("Failed to connect to websocket");
+            return;
+        }
+
+        System.out.println("Successfully joined game as player");
+        joinedGameID = Integer.parseInt(attemptedGameID);
+        teamPerspective = joinColor;
+        drawBoard(null);
+        isObserver = false;
+        gameLoop();
     }
 
     private void attemptListGames() {
@@ -299,45 +393,6 @@ public class ClientUI {
         }
     }
 
-    private void attemptJoinGame(String[] input) {
-        if (input.length != 3) {
-            System.out.println("missing input: join <ID> [WHITE|BLACK] - join a game");
-            return;
-        }
-
-        String attemptedGameID = input[1];
-        if (! attemptedGameID.matches("\\d+")) {
-            System.out.println("Incorrect input: ID must be a number");
-            System.out.println("Find the correct ID by searching the games list");
-            return;
-        }
-
-        String joinColor = input[2].toUpperCase();
-        if (! (joinColor.equals("WHITE") || joinColor.equals("BLACK"))) {
-            System.out.println("incorrect input: the team color must be WHITE or BLACK");
-        }
-
-        setPerspective(joinColor);
-
-        if (serverFacade.joinGame(joinColor, Integer.parseInt(attemptedGameID))) {
-            // INCOMPLETE: NEEDS TO CONNECT PLAYER VIA WEBSOCKET
-            joinedGameID = Integer.parseInt(attemptedGameID);
-            drawBoard(null);
-            System.out.println("Successfully joined game as player");
-            gameLoop();
-        } else {
-            System.out.println("Failed to join game. Try again");
-        }
-
-    }
-
-    private void setPerspective(String joinColor) {
-        if (joinColor.equals("WHITE")) {
-            teamPerspective = ChessGame.TeamColor.WHITE;
-        } else if (joinColor.equals("BLACK")) {
-            teamPerspective = ChessGame.TeamColor.BLACK;
-        }
-    }
 
     private void attemptLogout() {
         if (serverFacade.logout()) {
@@ -357,8 +412,6 @@ public class ClientUI {
         System.out.println("quit - pls don't");
         System.out.println("help - oi bruv, you lookin' at it");
     }
-
-
 
     private void attemptCreateGame(String[] input) {
         if (input.length == 1) {

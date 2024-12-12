@@ -171,4 +171,8 @@ public class ClientCommunicator {
     public Collection<GameData> getGamesList() {
         return gamesListCache;
     }
+
+    public String getAuthToken() {
+        return authToken;
+    }
 }

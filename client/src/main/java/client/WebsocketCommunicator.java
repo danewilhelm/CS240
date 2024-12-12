@@ -1,6 +1,7 @@
 package client;
 
 import javax.websocket.*;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Scanner;
@@ -22,8 +23,13 @@ public class WebsocketCommunicator extends Endpoint {
         });
     }
 
-    public void send(String msg) throws Exception {
-        this.session.getBasicRemote().sendText(msg);
+    public void send(String msg) {
+        try {
+            this.session.getBasicRemote().sendText(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("IOException was thrown when sending over websocket");
+        }
     }
 
     @Override

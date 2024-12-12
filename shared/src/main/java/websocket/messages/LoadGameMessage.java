@@ -2,11 +2,11 @@ package websocket.messages;
 
 import model.GameData;
 
-public class LoadGame extends ServerMessage {
+public class LoadGameMessage extends ServerMessage {
 
     private final GameData game;
 
-    public LoadGame(GameData game) {
+    public LoadGameMessage(GameData game) {
         super(ServerMessageType.LOAD_GAME);
         this.game = game;
     }

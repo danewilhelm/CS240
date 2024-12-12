@@ -15,11 +15,13 @@ public class ChessGame {
 
     private ChessBoard board;
     private TeamColor teamTurn;
+    private TeamColor teamResigned;
 
     public ChessGame() {
         this.board = new ChessBoard();
         this.board.resetBoard();
         this.teamTurn = TeamColor.WHITE;
+        this.teamResigned = null;
     }
     // ----------------------------------------- Getters, Setters, & Enum ----------------------------------------------------
     /**
@@ -157,6 +159,23 @@ public class ChessGame {
 
         // it is now the opponent's turn
         switchTeamTurn();
+    }
+
+    public void setTeamResigned(TeamColor team) {
+        this.teamResigned = team;
+    }
+
+    public TeamColor getTeamResigned() {
+        return this.teamResigned;
+    }
+
+    public TeamColor getGameWonTeam() {
+        // TODO: Implement
+        return TeamColor.WHITE;
+    }
+
+    public TeamColor getTeamColorOfChessPosition(ChessPosition position) {
+        return this.board.getPiece(position).getTeamColor();
     }
 
     // ----------------------------------------- Move Methods (Helper) ----------------------------------------------------

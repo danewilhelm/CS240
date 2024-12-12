@@ -27,12 +27,12 @@ public class ChessBoardUI {
     ChessPosition highlightedPosition;
     Collection<ChessPosition> legalMovePositions = new ArrayList<>();
 
-    public ChessBoardUI (ChessGame game, ChessGame.TeamColor teamColor, ChessPosition highlightedPosition) {
+    public ChessBoardUI (ChessGame game, String colorPerspective, ChessPosition highlightedPosition) {
         out = new PrintStream(System.out, true);
         out.print(SET_TEXT_BOLD);
 
         board = game.getBoard();
-        IS_WHITE_PERSPECTIVE = teamColor.equals(ChessGame.TeamColor.WHITE);
+        IS_WHITE_PERSPECTIVE = colorPerspective.equals("WHITE");
 
         sideHeaderIndex = IS_WHITE_PERSPECTIVE ? 0 : 7;
 
@@ -62,8 +62,8 @@ public class ChessBoardUI {
         ChessGame game = new ChessGame();
         game.getBoard().resetBoard();
 
-        ChessBoardUI blackPlayerPrinter = new ChessBoardUI(game, ChessGame.TeamColor.BLACK, null);
-        ChessBoardUI whitePlayerPrinter = new ChessBoardUI(game, ChessGame.TeamColor.WHITE, null);
+        ChessBoardUI blackPlayerPrinter = new ChessBoardUI(game, "BLACK", null);
+        ChessBoardUI whitePlayerPrinter = new ChessBoardUI(game, "WHITE", null);
         blackPlayerPrinter.drawChessBoardUI();
         whitePlayerPrinter.drawChessBoardUI();
     }
@@ -72,10 +72,10 @@ public class ChessBoardUI {
         ChessGame game = new ChessGame();
         game.getBoard().resetBoard();
 
-        ChessBoardUI blackPlayerPrinter = new ChessBoardUI(game, ChessGame.TeamColor.BLACK, new ChessPosition(2, 2));
+        ChessBoardUI blackPlayerPrinter = new ChessBoardUI(game, "BLACK", new ChessPosition(2, 2));
         blackPlayerPrinter.drawChessBoardUI();
 
-        ChessBoardUI otherBlackPlayerPrinter = new ChessBoardUI(game, ChessGame.TeamColor.BLACK, new ChessPosition(2, 3));
+        ChessBoardUI otherBlackPlayerPrinter = new ChessBoardUI(game, "WHITE", new ChessPosition(2, 3));
         otherBlackPlayerPrinter.drawChessBoardUI();
     }
 
