@@ -112,7 +112,7 @@ public class GameDatabaseDAO implements GameDAO {
                 preparedStatement.setString(2, updatedGame.blackUsername());
                 preparedStatement.setString(3, updatedGame.gameName());
 
-                var jsonChessBoard = new Gson().toJson(new ChessGame());
+                var jsonChessBoard = new Gson().toJson(updatedGame.game());
                 preparedStatement.setString(4, jsonChessBoard);
 
                 preparedStatement.setInt(5, updatedGame.gameID());

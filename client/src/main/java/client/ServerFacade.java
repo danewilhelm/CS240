@@ -1,10 +1,10 @@
 package client;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import model.GameData;
-import websocket.commands.ConnectPlayerCommand;
-import websocket.commands.LeaveCommand;
-import websocket.commands.UserGameCommand;
+import ui.ClientUI;
+import websocket.commands.*;
 
 import java.util.Collection;
 
@@ -13,16 +13,18 @@ public class ServerFacade {
     private final String serverURL;
     ClientCommunicator http;
     WebsocketCommunicator websocket;
+    private String teamColor;
 
     public ServerFacade(String serverURL) {
         http = new ClientCommunicator(this, serverURL);
         this.serverURL = serverURL;
+        teamColor = null;
     }
 
     // -------------------------------------Websocket connection methods-----------------------------------------
     private boolean connectWebsocket() {
         try {
-            websocket = new WebsocketCommunicator(serverURL);
+            websocket = new WebsocketCommunicator(serverURL, this.teamColor);
             return true;
         } catch (Exception e) {
             System.out.println("failed to connect websocket");
@@ -40,6 +42,7 @@ public class ServerFacade {
             return false;
         }
         sendWSCommand(new ConnectPlayerCommand(http.getAuthToken(), gameID, joinColor));
+        this.teamColor = joinColor;
         return true;
     }
 
@@ -48,6 +51,23 @@ public class ServerFacade {
             return false;
         }
         sendWSCommand(new LeaveCommand(http.getAuthToken(), gameID));
+        return true;
+    }
+
+    public boolean makeMove(int gameID, ChessMove makeMoveCommand) {
+        if (! connectWebsocket()) {
+            return false;
+        }
+        sendWSCommand(new MakeMoveCommand(http.getAuthToken(), gameID, makeMoveCommand));
+        return true;
+    }
+
+
+    public boolean resignGame(int gameID) {
+        if (! connectWebsocket()) {
+            return false;
+        }
+        sendWSCommand(new ResignCommand(http.getAuthToken(), gameID));
         return true;
     }
 

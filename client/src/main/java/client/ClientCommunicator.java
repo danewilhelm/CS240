@@ -117,7 +117,6 @@ public class ClientCommunicator {
                 "gameID", gameID,
                 "playerColor", playerColor.toUpperCase());
 
-        String json = new Gson().toJson(body);
         try {
             makeRequest("PUT","/game", body, null);
             return true;

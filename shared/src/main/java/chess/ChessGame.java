@@ -175,7 +175,11 @@ public class ChessGame {
     }
 
     public TeamColor getTeamColorOfChessPosition(ChessPosition position) {
-        return this.board.getPiece(position).getTeamColor();
+        ChessPiece piece = this.board.getPiece(position);
+        if (piece == null) {
+            return null;
+        }
+        return piece.getTeamColor();
     }
 
     // ----------------------------------------- Move Methods (Helper) ----------------------------------------------------

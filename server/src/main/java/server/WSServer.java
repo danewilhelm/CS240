@@ -10,26 +10,31 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.*;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @WebSocket
 public class WSServer {
 
     private Session session;
-    private static final Map<Session, Integer> sessionsMap = new HashMap<>();
+    private static final HashMap<String, UserSession> userSessionsMap = new HashMap<>();
+
+    public record UserSession (
+            int gameID,
+            Session session
+    ) {}
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
         this.session = session;
 
-
-        System.out.printf("Received: %s", message);
-        session.getRemote().sendString("WebSocket response: " + message);
+        System.out.printf("Received: %s\n", message);
+//        session.getRemote().sendString("WebSocket response: " + message);
 
         Gson serializer = new Gson();
         UserGameCommand command = serializer.fromJson(message, UserGameCommand.class);
@@ -72,7 +77,7 @@ public class WSServer {
     }
 
 
-    private void connectSessionAndBroadcast(GameData game, UserGameCommand connectPlayerCommand, String username) {
+    private void connectSessionAndBroadcast(GameData game, UserGameCommand connectPlayerCommand, String username) throws DataAccessException {
         String message;
         ChessGame.TeamColor teamColor = game.getTeamColorByUsername(username);
         if (teamColor!= null) {
@@ -80,51 +85,56 @@ public class WSServer {
         } else {
             message = username + "has connected as an observer";
         }
-        sessionsMap.put(session, connectPlayerCommand.getGameID());
-        broadcast(message, connectPlayerCommand, false);
+        userSessionsMap.put(username, new UserSession(game.gameID(), session));
+        broadcast(new NotificationMessage(message), connectPlayerCommand, false);
     }
 
-    private void disconnectSessionAndBroadcast(GameData game, LeaveCommand leaveCommand, String username) {
+    private void disconnectSessionAndBroadcast(GameData game, LeaveCommand leaveCommand, String username) throws DataAccessException {
         String message;
         ChessGame.TeamColor teamColor = game.getTeamColorByUsername(username);
         if (teamColor != null) {
             message = username + "has disconnected as " + teamColor;
         } else {
-            message = username + "has connected as an observer";
+            message = username + "has disconnected as an observer";
         }
-        sessionsMap.remove(session);
-        broadcast(message, leaveCommand, false);
+        userSessionsMap.remove(username);
+
+        broadcast(new NotificationMessage(message), leaveCommand, false);
     }
 
-    private void broadcast(String message, UserGameCommand command, boolean isBroadcastToSelf) {
-        int thisGameID = command.getGameID();
-        for (Session curSession : sessionsMap.keySet()) {
-            boolean sameGame = sessionsMap.get(curSession) == thisGameID;
-            boolean isSameSession = curSession.equals(this.session);
+    private void broadcast(ServerMessage message, UserGameCommand command, boolean isBroadcastToSelf) throws DataAccessException {
+        AuthDAO authDAO = new AuthDatabaseDAO();
+        AuthData authData = authDAO.getAuth(command.getAuthToken());
+        String ourUsername = authData.username();
+        Integer ourGameID = command.getGameID();
+        for (var entry : userSessionsMap.entrySet()) {
+            String curName = entry.getKey();
+            Integer curGameID = entry.getValue().gameID;
+            Session curSession = entry.getValue().session;
 
-            if (sameGame) {
-                if (isSameSession) {
-                    if (!isBroadcastToSelf) {
-                        continue;
-                    }
-                }
+            boolean sameGame = curGameID.equals(ourGameID);
+            if (! sameGame) {
+                continue;
+            }
+            boolean sameName = Objects.equals(curName, ourUsername);
 
-                try {
-                    Gson serializer = new Gson();
-                    NotificationMessage notification = new NotificationMessage(message);
-                    curSession.getRemote().sendString(serializer.toJson(notification));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            if (!isBroadcastToSelf && sameName) {
+                continue;
+            }
+
+            try {
+                Gson serializer = new Gson();
+                curSession.getRemote().sendString(serializer.toJson(message));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
 
-    private void sendNotificationToSelf(String message)  {
+    private void sendMessageToSelf(ServerMessage message)  {
         try {
             Gson serializer = new Gson();
-            NotificationMessage notification = new NotificationMessage(message);
-            session.getRemote().sendString(serializer.toJson(notification));
+            session.getRemote().sendString(serializer.toJson(message));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -148,7 +158,7 @@ public class WSServer {
         if (gameIsOver(chessGame)) {
             // if a player attempts to make a move after the game is over
             // notify only that player
-            sendNotificationToSelf("You cannot move any pieces because the game is over");
+            sendMessageToSelf(new ErrorMessage("You cannot move any pieces because the game is over"));
             return;
         }
 
@@ -158,31 +168,34 @@ public class WSServer {
                 throw new InvalidMoveException("Not your team");
             }
             game.game().makeMove(makeMoveCommand.getMove());
+            gameDAO.updateGame(game);
+            LoadGameMessage loadGameMessage = new LoadGameMessage(game);
+            broadcast(loadGameMessage, makeMoveCommand, true);
 
             // when a player makes a move
             // notify everyone about the move
-            broadcast(username + " moved " + makeMoveCommand.getMove().toString(), makeMoveCommand, true);
+            broadcast(new NotificationMessage(username + " moved " + makeMoveCommand.getMove().toString()), makeMoveCommand, true);
 
             // if the game is in stalemate
             // Notify everyone that the game is over
             if (game.game().isInStalemate(teamColor)) {
-                broadcast("Game has ended due to stalemate", makeMoveCommand, true);
+                broadcast(new NotificationMessage("Game has ended due to stalemate"), makeMoveCommand, true);
             }
             // if the game is in checkmate
             // Notify everyone that the game is over
             ChessGame.TeamColor oppositeTeamColor = teamColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
             if (game.game().isInCheckmate(oppositeTeamColor)) {
-                broadcast("Game has ended because " + oppositeTeamColor + " is in checkmate", makeMoveCommand, true);
+                broadcast(new NotificationMessage("Game has ended because " + oppositeTeamColor + " is in checkmate"), makeMoveCommand, true);
             }
             // if a player is in check
             // notify everyone
             else if (game.game().isInCheck(oppositeTeamColor)) {
-                broadcast(oppositeTeamColor + " is in check", makeMoveCommand, true);
+                broadcast(new NotificationMessage(oppositeTeamColor + " is in check"), makeMoveCommand, true);
             }
         } catch (InvalidMoveException e) {
             // when an exception is thrown (InvalidMoveException, UnauthorizedException, etc.)
             // notify only that player
-            sendNotificationToSelf("Sorry, your move was invalid because " + e.getMessage());
+            sendMessageToSelf(new ErrorMessage("Sorry, your move was invalid because " + e.getMessage()));
         }
     }
 
@@ -230,7 +243,7 @@ public class WSServer {
         GameData game = gameDAO.getGame(resignCommand.getGameID());
         ChessGame.TeamColor teamColor = game.getTeamColorByUsername(authData.username());
         if (teamColor == null) {
-            sendNotificationToSelf("Observers can't resign");
+            sendMessageToSelf(new ErrorMessage("Observers can't resign"));
             return;
         }
         if (teamColor == ChessGame.TeamColor.BLACK) {
@@ -239,7 +252,7 @@ public class WSServer {
         if (Objects.equals(game.whiteUsername(), authData.username())) {
             game.game().setTeamResigned(ChessGame.TeamColor.WHITE);
         }
-        broadcast(authData.username() + "has resigned as " + teamColor, resignCommand, false);
+        broadcast(new NotificationMessage(authData.username() + "has resigned as " + teamColor), resignCommand, false);
         gameDAO.updateGame(game);
     }
 

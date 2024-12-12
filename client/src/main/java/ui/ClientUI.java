@@ -25,6 +25,7 @@ public class ClientUI {
     private ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
 
 
+
     public static void main(String[] args) throws Exception {
         new ClientUI().run();
     }
@@ -35,8 +36,6 @@ public class ClientUI {
         String line = scanner.nextLine();
         return line.split(" ");
     }
-
-
 
     public void run() {
         System.out.println("Welcome to CS 240 chess. Type help to get started (^v^)");
@@ -228,13 +227,15 @@ public class ClientUI {
 
     private void leaveGame() {
         isObserver = false;
-        // TODO:
-        serverFacade.leaveGame(Integer.parseInt(attemptedGameID));
+        if (! serverFacade.leaveGame(joinedGameID)) {
+            System.out.println("failed to connect observer");
+        }
     }
 
     private void attemptMove(String[] input) {
         if (input.length < 3) {
             System.out.println("missing input to make a move");
+            return;
         }
 
         ChessPosition startPosition;
@@ -258,25 +259,46 @@ public class ClientUI {
         }
 
         ChessMove attemptedMove = new ChessMove(startPosition, endPosition, promotionPiece);
-        // TODO:
+        if (! serverFacade.makeMove(joinedGameID, attemptedMove))  {
+            System.out.println("failed to connect observer");
+        }
     }
 
-//    private ChessPiece.PieceType parsePromotionPiece(String str) {
-//        String string = s.toUpperCase() + "";
-//        ChessPiece.PieceType promotionPiece;
-//        switch (s) {
-//            case "Q":
-//                promotionPiece = ChessPiece.PieceType.QUEEN;
-//                break;
-//            case "K":
-//                promotionPiece = ChessPiece.PieceType.KING;
-//        }
-//    }
+    private ChessPiece.PieceType parsePromotionPiece(String str) {
+        String string = str.toUpperCase();
+        ChessPiece.PieceType promotionPiece;
+        switch (string) {
+            case "Q":
+                promotionPiece = ChessPiece.PieceType.QUEEN;
+                break;
+            case "K":
+                promotionPiece = ChessPiece.PieceType.KING;
+                break;
+            case "R":
+                promotionPiece = ChessPiece.PieceType.ROOK;
+                break;
+            case "N":
+                promotionPiece = ChessPiece.PieceType.KNIGHT;
+                break;
+            case "B":
+                promotionPiece = ChessPiece.PieceType.BISHOP;
+                break;
+            case "P":
+                promotionPiece = ChessPiece.PieceType.PAWN;
+                break;
+            default:
+                System.out.println("ERROR: did not parse promotion piece correctly");
+                return null;
+        }
+        return promotionPiece;
+    }
 
 
 
     private void resignGame() {
-        // TODO:
+        if (! serverFacade.resignGame(joinedGameID)) {
+            System.out.println("failed to connect observer");
+        }
     }
 
     private GameData getJoinedGame() {
@@ -318,7 +340,7 @@ public class ClientUI {
             return;
         }
 
-        if (! serverFacade.joinGame(null, givenGameID)) {
+        if (! serverFacade.connectPlayer(null, givenGameID)) {
             System.out.println("failed to connect observer");
             return;
         }
@@ -469,7 +491,6 @@ public class ClientUI {
         System.out.println("quit - exit the program");
         System.out.println("help - oi bruv, you lookin' at it");
     }
-
 
 
 
