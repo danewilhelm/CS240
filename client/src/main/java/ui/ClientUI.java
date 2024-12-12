@@ -5,7 +5,6 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import client.ServerFacade;
 import model.GameData;
-import service.BadRequestException;
 
 import java.util.Collection;
 import java.util.Scanner;
@@ -167,7 +166,7 @@ public class ClientUI {
         ChessPosition highlightedPosition;
         try {
              highlightedPosition = parseCoordinates(selectedCoordinates);
-        } catch (BadRequestException e) {
+        } catch (Exception e) {
             return;
         }
 
@@ -179,12 +178,12 @@ public class ClientUI {
         drawBoard(highlightedPosition);
     }
 
-    private ChessPosition parseCoordinates(String selectedCoordinates) throws BadRequestException {
+    private ChessPosition parseCoordinates(String selectedCoordinates) throws Exception {
         String givenColString = selectedCoordinates.charAt(0) + "";
         givenColString = givenColString.toLowerCase();
         if (! givenColString.matches("^[a-h]$")) {
             System.out.println("the coordinates you gave are not valid. Try the following format: B6, or c2");
-            throw new BadRequestException("");
+            throw new Exception("");
         }
 
         int givenRow = selectedCoordinates.charAt(1) - '0';
@@ -243,7 +242,7 @@ public class ClientUI {
         try {
             startPosition = parseCoordinates(input[1]);
             endPosition = parseCoordinates(input[2]);
-        } catch (BadRequestException e) {
+        } catch (Exception e) {
             return;
         }
 
