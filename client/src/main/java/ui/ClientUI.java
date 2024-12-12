@@ -1,6 +1,5 @@
 package ui;
 
-import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
@@ -9,7 +8,6 @@ import model.GameData;
 import service.BadRequestException;
 
 import java.util.Collection;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 
